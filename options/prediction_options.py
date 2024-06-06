@@ -24,8 +24,8 @@ class PredictionOptions:
         self.cov_inv = None
         self.objective = "adjusted_fit"
         self.adj_fit_multiplier = "K"
-        self.return_grid = False
-        self.return_weights_grid = False
+        self.is_return_grid = False
+        self.is_return_weights_grid = False
         
 
     def options_to_ndarray(self):
