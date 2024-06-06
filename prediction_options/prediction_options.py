@@ -1,15 +1,11 @@
-
-
 class PredictionOptions:
-
     """
     Prediction Options Class:
-        Supports a master default list of all possible input options used by predict, maxfit and optvar. 
-        Some models overlap in input options but setting a parameter that is not used by a given model will
-        not affect it. 
-        
-        See documentation for option definitions: {put gitbook link here}
+    Supports a master default list of all possible input options used by predict, maxfit and optvar.
+    Some models overlap in input options but setting a parameter that is not used by a given model will
+    not affect it.
 
+    See documentation for option definitions: {put gitbook link here}
     """
 
     def __init__(self):
@@ -30,6 +26,14 @@ class PredictionOptions:
 
 # Not a method. This function creates a new object and returns it
 def update_options(inputs):
+    """ Accepts a dictionary of inputs and returns a PredictionOptions obj updated with all passed optional values
+
+    Args:
+        inputs (dict): Intakes a dictionary of inputs deconstructed in the lambda function
+
+    Returns:
+        PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
+    """
     options = PredictionOptions()
     for key, value in inputs.items():
         if hasattr(options, key):
