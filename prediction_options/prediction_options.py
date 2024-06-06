@@ -33,6 +33,8 @@ class PredictionOptions:
         Returns:
             ndarray: Numpy array able to formatted easily into a .npz file
         """
+
+
         options_ndarray = []
         for attribute in dir(self):
             if not attribute.startswith("__"):
@@ -50,6 +52,8 @@ def update_options(inputs):
     Returns:
         PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
     """
+
+    
     options = PredictionOptions()
     for key, value in inputs.items():
         if hasattr(options, key):
