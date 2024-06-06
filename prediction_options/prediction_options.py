@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class PredictionOptions:
     """
     Prediction Options Class:
@@ -23,6 +26,19 @@ class PredictionOptions:
         self.threshold = None
         self.is_threshold_percent = True
 
+    def options_to_ndarray(self):
+        """Converts passed PredctionOptions obj into an ndarray so that it can be easily packaged locally into
+        .npz outputs
+
+        Returns:
+            ndarray: Numpy array able to formatted easily into a .npz file
+        """
+        options_ndarray = []
+        for attribute in dir(self):
+            if not attribute.startswith("__"):
+                options_ndarray.append(getattr(self, attribute))
+        return np.array(options_ndarray)
+
 
 # Not a method. This function creates a new object and returns it
 def update_options(inputs):
@@ -38,4 +54,5 @@ def update_options(inputs):
     for key, value in inputs.items():
         if hasattr(options, key):
             setattr(options, key, value)
+
     return options
