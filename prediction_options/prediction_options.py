@@ -54,10 +54,16 @@ def update_options(inputs):
         PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
     """
 
+    # Initialize new Object
+    Options = PredictionOptions()
 
-    options = PredictionOptions()
+    # Iterate through input dict key/value pairs
     for key, value in inputs.items():
-        if hasattr(options, key):
-            setattr(options, key, value)
 
-    return options
+        # If obj attribute matches key in input dict
+        if hasattr(Options, key):
+
+            # Update corresponding attribute in options object to hold dictionary value
+            setattr(Options, key, value)
+
+    return Options
