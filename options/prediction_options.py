@@ -34,10 +34,12 @@ class PredictionOptions:
                 self.__setattr__(key,value)
 
 
+
     def __getattr__(self, name):
         if name in self._options:
             return self._options[name]
         raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
+
 
     def __setattr__(self, name, value):
         if name == "_options":
@@ -47,20 +49,24 @@ class PredictionOptions:
         else:
             raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
 
+
     def display(self):
         for key, value in self._options.items():
             print(f"{key}: {value}")
 
 
-    def update_options(self, inputs):
-        """ Accepts a dictionary of inputs and returns a PredictionOptions obj updated with all passed optional values
+    def init_from_dict(self, inputs):
+        """ Accepts a dictionary of inputs and returns a PredictionOptions obj 
+        updated with all passed optional values
 
         Args:
-            inputs (dict): Intakes a dictionary of inputs deconstructed in the lambda function
+            inputs (dict): Intakes a dictionary of inputs deconstructed in the 
+            lambda function
 
         Returns:
             PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
         """
+
 
         # Iterate through input dict key/value pairs
         for key, value in inputs.items():
@@ -70,4 +76,3 @@ class PredictionOptions:
 
                 # Update corresponding attribute in options object to hold dictionary value
                 setattr(self, key, value)
-
