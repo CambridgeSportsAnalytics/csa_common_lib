@@ -1,1 +1,1 @@
-from helpers.class_to_dict import class_to_dict
+from helpers.class_helpers import class_to_dict
