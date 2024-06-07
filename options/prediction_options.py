@@ -11,22 +11,45 @@ class PredictionOptions:
     See documentation for option definitions: {put gitbook link here}
     """
 
-    def __init__(self):
-        self.threshold = None
-        self.is_threshold_percent = True
-        self.threshold_range = np.array((0, 0.20, 0.50, 0.80))
-        self.stepsize = 0.20
-        self.most_eval = True
-        self.eval_type = "relevance" 
-        self.attribute_combi = None
-        self.max_num_combi = 1_000_000
-        self.k = None
-        self.cov_inv = None
-        self.objective = "adjusted_fit"
-        self.adj_fit_multiplier = "K"
-        self.is_return_grid = False
-        self.is_return_weights_grid = False
-        
+    def __init__(self, **kwargs):
+        self._options = {
+            'threshold_range': (0, 1),
+            'stepsize': 0.20,
+            'most_eval': True,
+            'eval_type': 'relevance',
+            'cov_inv': None,
+            'objective': 'adjusted_fit',
+            'adj_fit_multiplier': 'K',
+            'return_grid': False,
+            'attribute_combi': None,
+            'k': None,
+            'return_weights_grid': False,
+            'threshold': None,
+            'is_threshold_percent': True
+        }
+            
+        # Update attributes with any provided kwargs
+        if kwargs:
+            for key, value in kwargs.items():
+                self.__setattr__(key,value)
+
+
+    def __getattr__(self, name):
+        if name in self._options:
+            return self._options[name]
+        raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
+
+    def __setattr__(self, name, value):
+        if name == "_options":
+            super().__setattr__(name, value)
+        elif name in self._options:
+            self._options[name] = value
+        else:
+            raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
+
+    def display(self):
+        for key, value in self._options.items():
+            print(f"{key}: {value}")
 
 
     def update_options(self, inputs):
