@@ -28,42 +28,23 @@ class PredictionOptions:
         self.is_return_weights_grid = False
         
 
-    def options_to_ndarray(self):
-        """Converts passed PredctionOptions obj into an ndarray so that it can be easily packaged locally into
-        .npz outputs
+
+    def update_options(self, inputs):
+        """ Accepts a dictionary of inputs and returns a PredictionOptions obj updated with all passed optional values
+
+        Args:
+            inputs (dict): Intakes a dictionary of inputs deconstructed in the lambda function
 
         Returns:
-            ndarray: Numpy array able to formatted easily into a .npz file
+            PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
         """
 
+        # Iterate through input dict key/value pairs
+        for key, value in inputs.items():
 
-        options_ndarray = []
-        for attribute in dir(self):
-            if not attribute.startswith("__"):
-                options_ndarray.append(getattr(self, attribute))
-        return np.array(options_ndarray)
+            # If obj attribute matches key in input dict
+            if hasattr(self, key):
 
+                # Update corresponding attribute in options object to hold dictionary value
+                setattr(self, key, value)
 
-def update_options(inputs):
-    """ Accepts a dictionary of inputs and returns a PredictionOptions obj updated with all passed optional values
-
-    Args:
-        inputs (dict): Intakes a dictionary of inputs deconstructed in the lambda function
-
-    Returns:
-        PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
-    """
-
-    # Initialize new Object
-    Options = PredictionOptions()
-
-    # Iterate through input dict key/value pairs
-    for key, value in inputs.items():
-
-        # If obj attribute matches key in input dict
-        if hasattr(Options, key):
-
-            # Update corresponding attribute in options object to hold dictionary value
-            setattr(Options, key, value)
-
-    return Options
