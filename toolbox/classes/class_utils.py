@@ -1,7 +1,7 @@
 import inspect
 
 
-def class_to_dict(obj):
+def class_obj_to_dict(obj):
     """Converts any class object into a dictionary containing its attributes and
     respective values
 
@@ -22,7 +22,7 @@ def class_to_dict(obj):
         return {name: value for name, value in attributes if not name.startswith('_')}
 
 
-def is_user_defined_class(obj):
+def is_obj_userdefined_class(obj):
     """Check if the object is a user-defined class instance.
 
     Args:
