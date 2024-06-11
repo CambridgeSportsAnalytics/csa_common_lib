@@ -1,0 +1,81 @@
+import numpy as np
+
+class VaultMetadata:
+    """
+    Vault Metadata Class:
+    Supports a master default list of all possible metadata used in the vault.
+
+    See documentation for option definitions: {put gitbook link here}
+    """
+
+    def __init__(self, **kwargs):
+        self._metadata = {
+            'person_id': None,
+            'y_metric_id': None,
+            'product_id': None,
+            'x_labels': None,
+        }
+            
+        # Update attributes with any provided kwargs
+        if kwargs:
+            for key, value in kwargs.items():
+                self.__setattr__(key, value)
+
+    def __getattr__(self, name):
+        if name in self._metadata:
+            return self._metadata[name]
+        raise AttributeError(f"'VaultMetadata' object has no attribute '{name}'")
+
+    def __setattr__(self, name, value):
+        if name == "_metadata":
+            super().__setattr__(name, value)
+        elif name in self._metadata:
+            self._metadata[name] = value
+        else:
+            raise AttributeError(f"'VaultMetadata' object has no attribute '{name}'")
+
+    def display(self):
+        for key, value in self._metadata.items():
+            print(f"{key}: {value}")
+
+    def init_from_dict(self, inputs):
+        """ Accepts a dictionary of inputs and returns a VaultMetadata obj 
+        updated with all passed optional values
+
+        Args:
+            inputs (dict): Intakes a dictionary of inputs deconstructed in the 
+            lambda function
+
+        Returns:
+            VaultMetadata:  VaultMetadata obj that holds all passed optional values. Non-passed options remain default setting
+        """
+        # Iterate through input dict key/value pairs
+        for key, value in inputs.items():
+            # If obj attribute matches key in input dict
+            if hasattr(self, key):
+                # Update corresponding attribute in options object to hold dictionary value
+                setattr(self, key, value)
+
+
+    def update_fields(self, field_list):
+        """ Update the metadata fields dynamically based on the provided field list.
+
+        Args:
+            field_list (list): List of field names to update the metadata structure.
+        """
+
+        
+        current_keys = set(self._metadata.keys())
+        new_keys = set(field_list)
+
+        # Remove keys that are no longer in the field list
+        for key in current_keys - new_keys:
+            del self._metadata[key]
+
+        # Add new keys that are not in the current metadata
+        for key in new_keys - current_keys:
+            self._metadata[key] = None
+
+        # Ensure all attributes are updated
+        for key in self._metadata.keys():
+            setattr(self, key, self._metadata[key])
