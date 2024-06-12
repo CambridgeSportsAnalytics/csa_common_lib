@@ -38,6 +38,6 @@ def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Option
     metadata = class_obj_to_dict(Metadata)['metadata']
 
     save_to_npz(filename=filename, single_precision= False, inputs=inputs,
-                      results=yhat_details, Metadata=metadata)
+                      results=yhat_details, metadata=metadata)
     
     return f"{filename}.npz generated"
