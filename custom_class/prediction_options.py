@@ -20,10 +20,10 @@ class PredictionOptions:
             'cov_inv': None,
             'objective': 'adjusted_fit',
             'adj_fit_multiplier': 'K',
-            'return_grid': False,
+            'is_return_grid': False,
             'attribute_combi': None,
             'k': None,
-            'return_weights_grid': False,
+            'is_return_weights_grid': False,
             'threshold': None,
             'is_threshold_percent': True
         }
