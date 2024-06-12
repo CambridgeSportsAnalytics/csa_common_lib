@@ -14,9 +14,6 @@ from toolbox.classes.class_utils import class_obj_to_dict, is_obj_userdefined_cl
 
 sys.path.insert(0, os.path.dirname(three_levels_up))
 
-from psr_lambda._private._helpers import calc_crc64
-
-
 
 
 def load_npz(file_path: str) -> dict:
