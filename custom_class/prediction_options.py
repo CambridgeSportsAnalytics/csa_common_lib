@@ -12,7 +12,7 @@ class PredictionOptions:
     """
 
     def __init__(self, **kwargs):
-        self._options = {
+        self.options = {
             'threshold_range': (0, 1),
             'stepsize': 0.20,
             'most_eval': True,
@@ -36,22 +36,22 @@ class PredictionOptions:
 
 
     def __getattr__(self, name):
-        if name in self._options:
-            return self._options[name]
+        if name in self.options:
+            return self.options[name]
         raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
 
 
     def __setattr__(self, name, value):
-        if name == "_options":
+        if name == "options":
             super().__setattr__(name, value)
-        elif name in self._options:
-            self._options[name] = value
+        elif name in self.options:
+            self.options[name] = value
         else:
             raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
 
 
     def display(self):
-        for key, value in self._options.items():
+        for key, value in self.options.items():
             print(f"{key}: {value}")
 
 

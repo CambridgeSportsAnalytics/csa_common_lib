@@ -9,13 +9,18 @@ three_levels_up = os.path.dirname(os.path.dirname(os.path.dirname(current_file_p
 sys.path.insert(0, three_levels_up)
 
 # Import necessary csa_common_lib modules
-from helpers._vault_io import prepare_vault_data
 from helpers._conversions import convert_to_float32
 from toolbox.classes.class_utils import class_obj_to_dict, is_obj_userdefined_class
 
+sys.path.insert(0, os.path.dirname(three_levels_up))
 
-def load_npz(file_path:str):
-    """Loads passed .npz and returns a dict object
+from psr_lambda._private._helpers import calc_crc64
+
+
+
+
+def load_npz(file_path: str) -> dict:
+    """Loads passed .npz and returns a dictionary object
 
     Args:
         file_path (str): Path to npz file 
@@ -23,30 +28,29 @@ def load_npz(file_path:str):
     Returns:
         obj (dict): dictionary of key/values in the npz
     """
-
-
     if os.path.exists(file_path):
-
         # Try loading the npz into an obj variable to be parsed
         try:
-            with np.load(os.path.normpath(file_path), allow_pickle=True) as obj:
-
-                # Try parsing the npz file into database fields
-                try:
-                    inputs, results, checksum = prepare_vault_data(obj)
-                    return inputs, results, checksum
-                except Exception as e:
-                    print("Failed to parse npz data: ", e)
-                    return None, None, None
+            with np.load(os.path.normpath(file_path), allow_pickle=True) as npz_file:
+                # Initialize an empty dictionary to store the contents
+                obj = {}
                 
+                # Iterate over the keys in the npz file and populate the dictionary
+                for key in npz_file.files:
+                    # Convert ndarrays to lists
+                    if isinstance(npz_file[key], np.ndarray):
+                        obj[key] = npz_file[key].tolist()
+                    else:
+                        obj[key] = npz_file[key]
+                        
+                return obj
+
         except Exception as e:
             print("Failed to load npz: ", e)
-            return None, None, None
+            return {}
     else:
         print(f"Invalid file path {file_path}")
-        return None, None, None
-    
-
+        return {}
 
         
 def save_to_npz(filename:str=None, single_precision:bool=False, **data):

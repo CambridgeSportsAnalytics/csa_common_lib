@@ -9,7 +9,7 @@ class VaultMetadata:
     """
 
     def __init__(self, **kwargs):
-        self._metadata = {
+        self.metadata = {
             'person_id': None,
             'y_metric_id': None,
             'product_id': None,
@@ -22,15 +22,15 @@ class VaultMetadata:
                 self.__setattr__(key, value)
 
     def __getattr__(self, name):
-        if name in self._metadata:
-            return self._metadata[name]
+        if name in self.metadata:
+            return self.metadata[name]
         raise AttributeError(f"'VaultMetadata' object has no attribute '{name}'")
 
     def __setattr__(self, name, value):
-        if name == "_metadata":
+        if name == "metadata":
             super().__setattr__(name, value)
-        elif name in self._metadata:
-            self._metadata[name] = value
+        elif name in self.metadata:
+            self.metadata[name] = value
         else:
             raise AttributeError(f"'VaultMetadata' object has no attribute '{name}'")
 
@@ -65,17 +65,17 @@ class VaultMetadata:
         """
 
         
-        current_keys = set(self._metadata.keys())
+        current_keys = set(self.metadata.keys())
         new_keys = set(field_list)
 
         # Remove keys that are no longer in the field list
         for key in current_keys - new_keys:
-            del self._metadata[key]
+            del self.metadata[key]
 
         # Add new keys that are not in the current metadata
         for key in new_keys - current_keys:
-            self._metadata[key] = None
+            self.metadata[key] = None
 
         # Ensure all attributes are updated
-        for key in self._metadata.keys():
-            setattr(self, key, self._metadata[key])
+        for key in self.metadata.keys():
+            setattr(self, key, self.metadata[key])
