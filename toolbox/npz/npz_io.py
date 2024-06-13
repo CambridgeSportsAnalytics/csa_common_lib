@@ -12,9 +12,6 @@ sys.path.insert(0, three_levels_up)
 from helpers._conversions import convert_to_float32
 from toolbox.classes.class_utils import class_obj_to_dict, is_obj_userdefined_class
 
-sys.path.insert(0, os.path.dirname(three_levels_up))
-
-
 
 def load_npz(file_path: str) -> dict:
     """Loads passed .npz and returns a dictionary object
@@ -25,13 +22,14 @@ def load_npz(file_path: str) -> dict:
     Returns:
         obj (dict): dictionary of key/values in the npz
     """
+
     if os.path.exists(file_path):
         # Try loading the npz into an obj variable to be parsed
         try:
             with np.load(os.path.normpath(file_path), allow_pickle=True) as npz_file:
                 # Initialize an empty dictionary to store the contents
                 obj = {}
-                
+
                 # Iterate over the keys in the npz file and populate the dictionary
                 for key in npz_file.files:
                     # Convert ndarrays to lists
@@ -39,7 +37,7 @@ def load_npz(file_path: str) -> dict:
                         obj[key] = npz_file[key].tolist()
                     else:
                         obj[key] = npz_file[key]
-                        
+
                 return obj
 
         except Exception as e:
@@ -49,12 +47,16 @@ def load_npz(file_path: str) -> dict:
         print(f"Invalid file path {file_path}")
         return {}
 
-        
-def save_to_npz(filename:str=None, single_precision:bool=False, **data):
-    """ Saves the data into a compressed file.
+
+def save_to_npz(filename: str = None, single_precision: bool = False, **data):
+    """Saves the data into a compressed file.
 
     Parameters
     ----------
+    filename : str, optional
+        The name of the file to save data in, by default None
+    single_precision : bool, optional
+        If True, converts data to float32 before saving, by default False
     **data
         Varargin of data types, input variables. Name of variables are
         preserved for the payload.
@@ -64,6 +66,7 @@ def save_to_npz(filename:str=None, single_precision:bool=False, **data):
     npz_file : TemporaryFile
         Compressed file object
     """
+
     """
     # Ensure the filename ends with '.npz'
     if not filename.endswith(".npz"):
@@ -83,14 +86,12 @@ def save_to_npz(filename:str=None, single_precision:bool=False, **data):
         if is_obj_userdefined_class(data[key]):
             data[key] = class_obj_to_dict(value)
 
-
-     # Convert all data to float32 before saving, if requested
+    # Convert all data to float32 before saving, if requested
     if single_precision:
         data = {k: convert_to_float32(v) for k, v in data.items()}
 
-        
-    # save numpy array(s) or data types into a compressed file
+    # Save numpy array(s) or data types into a compressed file
     np.savez_compressed(filename, **data)
 
-    # return the file
+    # Return the file
     return filename

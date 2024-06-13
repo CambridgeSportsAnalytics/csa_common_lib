@@ -31,10 +31,19 @@ def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Option
         _type_: _description_
     """
 
+
     # Package all the input fields in a dictionary
     inputs = {'y': y,'X':X,'theta':theta,'options':class_obj_to_dict(Options)['options']}
 
-    # Convert to dictionary 
+
+    #observations, metric_id = Metadata.person_id, Metadata.y_metric_id
+
+    # validate_data_flag = validate_vault_npz_data(y,X,theta,yhat_details) [local function]
+    # if validate_data_flag is true --> handle metadata
+    # meta_data_flag = vault_metadata_handler(observations, metric_id) [endpoint --> lambda call]
+    # if flag is True --> package metadata and save_to_npz
+
+    # Package metadata
     metadata = class_obj_to_dict(Metadata)['metadata']
 
     save_to_npz(filename=filename, single_precision= False, inputs=inputs,
