@@ -10,8 +10,8 @@ class VaultMetadata:
 
     def __init__(self, **kwargs):
         self.metadata = {
-            'person_id': None,
-            'y_metric_id': None,
+            'observations': None,
+            'y_metric': None,
             'product_id': None,
             'x_labels': None,
         }
