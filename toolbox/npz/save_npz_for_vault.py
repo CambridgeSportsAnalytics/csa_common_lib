@@ -31,7 +31,7 @@ def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Option
 
     #observations, metric_id = Metadata.person_id, Metadata.y_metric_id
 
-    #validate_data_flag = validate_vault_npz_data(y,X,theta,yhat_details, Metadata)
+    validate_data_flag = validate_vault_npz_data(y, X, theta, yhat_details, Metadata) 
     # if validate_data_flag is true --> handle metadata
     # meta_data_flag = vault_metadata_handler(observations, metric_id) [endpoint --> lambda call]
     # if flag is True --> package metadata and save_to_npz
