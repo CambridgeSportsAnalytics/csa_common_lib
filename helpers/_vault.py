@@ -2,13 +2,8 @@ import sys
 import os
 import numpy as np
 
-# Move path to access csa_common_lib classes
-current_file_path = os.path.abspath(__file__)
-three_levels_up = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
-sys.path.insert(0, three_levels_up)
-
-from custom_class.vault_metadata import VaultMetadata
-from custom_class.prediction_options import PredictionOptions
+from csa_common_lib.custom_class.vault_metadata import VaultMetadata
+from csa_common_lib.custom_class.prediction_options import PredictionOptions
 
 
 def validate_vault_npz_data(y, X, theta, yhat_details, metadata:VaultMetadata, options:PredictionOptions) -> bool:

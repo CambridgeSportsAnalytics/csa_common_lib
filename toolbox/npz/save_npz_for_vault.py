@@ -1,18 +1,10 @@
-import sys
-import os
-
 from .npz_io import save_to_npz
 
-# Move path to access helper functions
-current_file_path = os.path.abspath(__file__)
-three_levels_up = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
-sys.path.insert(0, three_levels_up)
-
 # Import necessary csa_common_lib modules
-from custom_class.prediction_options import PredictionOptions
-from custom_class.vault_metadata import VaultMetadata
-from helpers._vault import validate_vault_npz_data
-from toolbox.classes.class_utils import class_obj_to_dict
+from csa_common_lib.custom_class.prediction_options import PredictionOptions
+from csa_common_lib.custom_class.vault_metadata import VaultMetadata
+from csa_common_lib.helpers._vault import validate_vault_npz_data
+from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
 
 
 def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions=PredictionOptions()):
@@ -39,7 +31,7 @@ def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Option
 
     #observations, metric_id = Metadata.person_id, Metadata.y_metric_id
 
-    validate_data_flag = validate_vault_npz_data(y,X,theta,yhat_details, Metadata)
+    #validate_data_flag = validate_vault_npz_data(y,X,theta,yhat_details, Metadata)
     # if validate_data_flag is true --> handle metadata
     # meta_data_flag = vault_metadata_handler(observations, metric_id) [endpoint --> lambda call]
     # if flag is True --> package metadata and save_to_npz

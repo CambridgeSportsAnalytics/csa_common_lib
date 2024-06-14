@@ -3,14 +3,9 @@ import numpy as np
 import json
 import sys
 
-# Move path to access helper functions
-current_file_path = os.path.abspath(__file__)
-three_levels_up = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
-sys.path.insert(0, three_levels_up)
-
 # Import necessary csa_common_lib modules
-from helpers._conversions import convert_to_float32
-from toolbox.classes.class_utils import class_obj_to_dict, is_obj_userdefined_class
+from csa_common_lib.helpers._conversions import convert_to_float32
+from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict, is_obj_userdefined_class
 
 
 def load_npz(file_path: str) -> dict:
