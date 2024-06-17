@@ -9,7 +9,7 @@ from csa_common_lib.helpers._vault import validate_vault_npz_data
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
 
 
-def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions=PredictionOptions()):
+def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions = PredictionOptions()):
     """save_to_npz() wrapper for uploading to vault results. 
 
     Args:
