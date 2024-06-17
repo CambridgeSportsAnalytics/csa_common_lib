@@ -1,3 +1,5 @@
+import psr_lambda
+
 from .npz_io import save_to_npz
 
 # Import necessary csa_common_lib modules
@@ -7,7 +9,7 @@ from csa_common_lib.helpers._vault import validate_vault_npz_data
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
 
 
-def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions=PredictionOptions()):
+def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions=PredictionOptions()):
     """save_to_npz() wrapper for uploading to vault results. 
 
     Args:
@@ -21,7 +23,7 @@ def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Option
             Defaults to PredictionOptions().
 
     Returns:
-        _type_: _description_
+        Status printout and .npz file
     """
 
 
@@ -29,13 +31,27 @@ def save(filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Option
     inputs = {'y': y,'X':X,'theta':theta,'options':class_obj_to_dict(Options)['options']}
 
 
-    #observations, metric_id = Metadata.person_id, Metadata.y_metric_id
+    observations, y_metrics = Metadata.observations, Metadata.y_metric
 
     validate_data_flag = validate_vault_npz_data(y, X, theta, yhat_details, Metadata) 
-    # if validate_data_flag is true --> handle metadata
-    # meta_data_flag = vault_metadata_handler(observations, metric_id) [endpoint --> lambda call]
-    # if flag is True --> package metadata and save_to_npz
+    if validate_data_flag is True:
+        # Use endpoint wrapper to post vault metadata and retrieve reference ids
+        metadata_ids = psr_lambda.post_vault_metadata(api_key=api_key,observations=observations, y_metrics=y_metrics)
 
+        # Check that metadata post wrapper returns the data we need for saving
+        if 'observations' in metadata_ids.keys() and 'y_metrics' in metadata_ids.keys():
+
+            # Check that metadata id arrays are not empty
+            if len(metadata_ids['observations']) > 0 and len(metadata_ids['y_metrics']) > 0:
+
+                # Overwrite metadata fields with reference ids before packaging
+                Metadata.observations = metadata_ids['observations']
+                Metadata.y_metric = metadata_ids['y_metrics']
+            else:
+                raise ValueError("Returned metadata id list was empty")
+        else:
+            raise ValueError("Vault metadata not returned")
+        
     # Package metadata
     metadata = class_obj_to_dict(Metadata)['metadata']
 
