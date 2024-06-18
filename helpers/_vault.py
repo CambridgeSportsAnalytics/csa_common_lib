@@ -39,8 +39,7 @@ def validate_vault_npz_data(y, X, theta, yhat_details, Metadata:VaultMetadata, O
         raise ValueError("Mismatch in # of observations between X and y (inputs)")
     if not isinstance(Metadata.observations, list):
         raise ValueError("Metadata.observations needs to be of type list. It is of type: ", str(type(Metadata.observations)))
-    if not isinstance(Metadata.y_metric, list):
-        raise ValueError("Metadata.y_metric needs to be of type list. It is of type: ", str(type(Metadata.y_metric)))
+
     
     # If not of the above formatting errors come up, return True.
     return True
