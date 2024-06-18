@@ -35,8 +35,9 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
 
     validate_data_flag = validate_vault_npz_data(y, X, theta, yhat_details, Metadata, Options=Options) 
     if validate_data_flag is True:
+
         # Use endpoint wrapper to post vault metadata and retrieve reference ids
-        metadata_ids = psr_lambda.post_vault_metadata(api_key=api_key,observations=observations, y_metrics=y_metrics)
+        metadata_ids = psr_lambda.post_vault_pointer_data(api_key=api_key,observations=observations, y_metrics=y_metrics)
 
         # Check that metadata post wrapper returns the data we need for saving
         if 'observations' in metadata_ids.keys() and 'y_metrics' in metadata_ids.keys():
@@ -48,7 +49,7 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
                 Metadata.observations = metadata_ids['observations']
                 Metadata.y_metric = metadata_ids['y_metrics']
             else:
-                raise ValueError("Returned metadata id list was empty")
+                raise ValueError("Returned metadata list was empty")
         else:
             raise ValueError("Vault metadata not returned")
         
