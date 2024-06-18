@@ -1,3 +1,4 @@
+import json
 import psr_lambda
 
 from .npz_io import save_to_npz
@@ -37,17 +38,19 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
     if validate_data_flag is True:
 
         # Use endpoint wrapper to post vault metadata and retrieve reference ids
-        metadata_ids = psr_lambda.post_vault_pointer_data(api_key=api_key,observations=observations, y_metric=y_metric, X=X, y=y)
-
+        metadata_response = psr_lambda.post_vault_pointer_data(api_key=api_key,observations=observations, y_metric=y_metric, X=X, y=y)
+        metadata_ids = json.loads(metadata_response)
+        
         # Check that metadata post wrapper returns the data we need for saving
-        if 'observations' in metadata_ids.keys() and 'y_metrics' in metadata_ids.keys():
+        if metadata_ids['pointers']:
+            metadata_ids = json.loads(metadata_response)['pointers']
 
             # Check that metadata id arrays are not empty
-            if len(metadata_ids['observations']) > 0 and len(metadata_ids['y_metrics']) > 0:
+            if len(metadata_ids['observations']) > 0 and metadata_ids['y_metric']:
 
                 # Overwrite metadata fields with reference ids before packaging
                 Metadata.observations = metadata_ids['observations']
-                Metadata.y_metric = metadata_ids['y_metrics']
+                Metadata.y_metric = metadata_ids['y_metric']
             else:
                 raise ValueError("Returned metadata list was empty")
         else:
