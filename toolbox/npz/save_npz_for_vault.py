@@ -37,7 +37,7 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
     if validate_data_flag is True:
 
         # Use endpoint wrapper to post vault metadata and retrieve reference ids
-        metadata_ids = psr_lambda.post_vault_pointer_data(api_key=api_key,observations=observations, y_metric=y_metric)
+        metadata_ids = psr_lambda.post_vault_pointer_data(api_key=api_key,observations=observations, y_metric=y_metric, X=X, y=y)
 
         # Check that metadata post wrapper returns the data we need for saving
         if 'observations' in metadata_ids.keys() and 'y_metrics' in metadata_ids.keys():
