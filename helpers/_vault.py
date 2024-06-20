@@ -25,21 +25,34 @@ def validate_vault_npz_data(y, X, theta, yhat_details, Metadata:VaultMetadata, O
         bool: flag describing if data is formatted correctly
     """
 
-    k = int(Options.k)
+
+    # check list types
+    if not isinstance(Metadata.Xcol_labels, list):
+        raise ValueError("Metadata.Xcol_labels needs to be of type list. It is of type: ", str(type(Metadata.Xcol_labels)))
+    if not isinstance(Metadata.Xrow_labels, list):
+        raise ValueError("Metadata.Xrow_labels needs to be of type list. It is of type: ", str(type(Metadata.Xrow_labels)))
+    if not isinstance(Metadata.outcome_labels, list):
+        raise ValueError("Metadata.outcome_labels needs to be of type list. It is of type: ", str(type(Metadata.outcome_labels)))
+
 
     # Check that column dimensions match accross data 
+    if len(theta) > 0:
+        if len(theta[0]) != len(Metadata.Xcol_labels):
+            raise ValueError("The number of variables in theta does not match Metadata.Xcol_labels")
+        if len(Metadata.outcome_labels) != len(theta):
+            raise ValueError("Metadata.outcome_labels does not match the length of theta")
+    
+    if len(Metadata.Xrow_labels) != len(X):
+        raise ValueError("Metadata.Xrow_labels does not match the length of t in the X matrix")
+    if len(Metadata.Xrow_labels) != len(y):
+        raise ValueError("Metadata.Xrow_labels does not match the length of y (inputs)")
     if len(theta) < 1:
         raise ValueError("Theta is empty. Please supply experiment conditions")
-    if len(theta) > 0:
-        if len(theta[0]) != k:
-            raise ValueError("The number of variables in theta does not match k")
-    if len(Metadata.x_labels) != k: 
-        raise ValueError("The number of supplied X_labels does not match k")
     if len(y) != len(X):
         raise ValueError("Mismatch in # of observations between X and y (inputs)")
-    if not isinstance(Metadata.observations, list):
-        raise ValueError("Metadata.observations needs to be of type list. It is of type: ", str(type(Metadata.observations)))
-
+    
+    
+    
     
     # If not of the above formatting errors come up, return True.
     return True

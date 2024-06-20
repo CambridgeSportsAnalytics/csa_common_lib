@@ -32,15 +32,20 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
     inputs = {'y': y,'X':X,'theta':theta,'options':class_obj_to_dict(Options)['options']}
 
 
-    observations, y_metric = Metadata.observations, Metadata.y_metric
+    Xcol_labels, Xrow_labels, outcome_labels, y_metric = Metadata.Xcol_labels, Metadata.Xrow_labels, Metadata.outcome_labels, Metadata.y_metric
 
     validate_data_flag = validate_vault_npz_data(y, X, theta, yhat_details, Metadata, Options=Options) 
     if validate_data_flag is True:
 
         # Use endpoint wrapper to post vault metadata and retrieve reference ids
-        metadata_response = psr_lambda.post_vault_pointer_data(api_key=api_key,observations=observations, y_metric=y_metric, X=X, y=y)
+        metadata_response = psr_lambda.post_vault_pointer_data(api_key=api_key, 
+                                                            Xcol_labels=Xcol_labels,
+                                                            Xrow_labels=Xrow_labels,
+                                                            outcome_labels=outcome_labels,
+                                                            y_metric=y_metric, X=X, y=y)
         metadata_ids = json.loads(metadata_response)
         
+        """
         # Check that metadata post wrapper returns the data we need for saving
         if metadata_ids['pointers']:
             metadata_ids = json.loads(metadata_response)['pointers']
@@ -55,7 +60,7 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
                 raise ValueError("Returned metadata list was empty")
         else:
             raise ValueError("Vault metadata not returned")
-        
+        """
     # Package metadata
     metadata = class_obj_to_dict(Metadata)['metadata']
 

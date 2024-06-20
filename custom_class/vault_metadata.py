@@ -10,10 +10,11 @@ class VaultMetadata:
 
     def __init__(self, **kwargs):
         self.metadata = {
-            'observations': None,
             'y_metric': None,
             'product_id': None,
-            'x_labels': None,
+            'Xcol_labels': None,
+            'Xrow_labels': None,
+            'outcome_labels': None
         }
             
         # Update attributes with any provided kwargs
