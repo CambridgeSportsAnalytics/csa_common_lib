@@ -69,6 +69,7 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
                                                             y_metric=y_metric, X=X, y=y)
         metadata_ids = json.loads(metadata_response)
 
+        print('Successfully posted metadata to db')
         # Prepare the payload for the POST request
         payload = {
             'metadata_ids': json.dumps(metadata_ids),
@@ -78,11 +79,6 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
             'theta': json.dumps(convert_ndarray_to_list(theta))
         }
 
-        # Make the POST request to the endpoint
-        
-        
-        #return response
-
         # Convert payload to JSON string
         payload_json = json.dumps(payload)
 
@@ -91,6 +87,7 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
         bucket_name = 'post-npz'
         s3_key = f'vault_payloads/testing.json'
         s3.put_object(Bucket=bucket_name, Key=s3_key, Body=payload_json)
+        print("s3 file successfully generated. Waiting for response from post-vault")
 
         response = requests.post("https://v9spadcya3.execute-api.us-east-1.amazonaws.com/v1/vault", json={'s3_key':str(s3_key)}, headers={'x-api-key': f'{api_key}'})
 
