@@ -1,6 +1,7 @@
 import json
 import requests
 import psr_lambda
+import numpy as np
 
 from .npz_io import save_to_npz
 
@@ -9,6 +10,27 @@ from csa_common_lib.custom_class.prediction_options import PredictionOptions
 from csa_common_lib.custom_class.vault_metadata import VaultMetadata
 from csa_common_lib.helpers._vault import validate_vault_npz_data
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
+
+def convert_ndarray_to_list(obj):
+    """
+    Recursively converts numpy ndarrays within an object to lists.
+    
+    Parameters:
+    obj (any): The input object which may contain numpy ndarrays.
+
+    Returns:
+    any: The converted object with all numpy ndarrays turned into lists.
+    """
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {k: convert_ndarray_to_list(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_ndarray_to_list(item) for item in obj]
+    elif isinstance(obj, tuple):
+        return tuple(convert_ndarray_to_list(item) for item in obj)
+    else:
+        return obj
 
 
 def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions = PredictionOptions()):
@@ -51,8 +73,8 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
             'metadata_ids': json.dumps(metadata_ids),
             'options': json.dumps(class_obj_to_dict(Options)['options']),
             'Metadata':json.dumps(class_obj_to_dict(Metadata)['metadata']),
-            'results': json.dumps(yhat_details),  # Assuming yhat_details is in an appropriate format
-            'theta': json.dumps(theta.tolist())
+            'results': json.dumps(convert_ndarray_to_list(yhat_details)),  # Assuming yhat_details is in an appropriate format
+            'theta': json.dumps(convert_ndarray_to_list(theta))
         }
 
         # Make the POST request to the endpoint
