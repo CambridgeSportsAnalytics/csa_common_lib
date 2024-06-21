@@ -84,7 +84,7 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
 
         # Upload payload to S3
         s3 = boto3.client('s3')
-        bucket_name = 'post-npz'
+        bucket_name = 'post-vault'
         s3_key = f'vault_payloads/testing.json'
         s3.put_object(Bucket=bucket_name, Key=s3_key, Body=payload_json)
         print("s3 file successfully generated. Waiting for response from post-vault")
