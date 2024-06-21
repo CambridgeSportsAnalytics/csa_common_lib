@@ -1,4 +1,5 @@
 import json
+import requests
 import psr_lambda
 
 from .npz_io import save_to_npz
@@ -38,12 +39,26 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
     if validate_data_flag is True:
 
         # Use endpoint wrapper to post vault metadata and retrieve reference ids
-        metadata_response = psr_lambda.post_vault_pointer_data(api_key=api_key, 
+        metadata_response = psr_lambda.post_vault_fk_data(api_key=api_key, 
                                                             Xcol_labels=Xcol_labels,
                                                             Xrow_labels=Xrow_labels,
                                                             outcome_labels=outcome_labels,
                                                             y_metric=y_metric, X=X, y=y)
         metadata_ids = json.loads(metadata_response)
+
+        # Prepare the payload for the POST request
+        payload = {
+            'metadata_ids': json.dumps(metadata_ids),
+            'options': json.dumps(class_obj_to_dict(Options)['options']),
+            'Metadata':json.dumps(class_obj_to_dict(Metadata)['metadata']),
+            'results': json.dumps(yhat_details),  # Assuming yhat_details is in an appropriate format
+            'theta': json.dumps(theta.tolist())
+        }
+
+        # Make the POST request to the endpoint
+        response = requests.post("https://v9spadcya3.execute-api.us-east-1.amazonaws.com/v1/vault", json=payload, headers={'x-api-key': f'{api_key}'})
+        
+        return response
         
         """
         # Check that metadata post wrapper returns the data we need for saving
@@ -62,9 +77,9 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
             raise ValueError("Vault metadata not returned")
         """
     # Package metadata
-    metadata = class_obj_to_dict(Metadata)['metadata']
+    #metadata = class_obj_to_dict(Metadata)['metadata']
 
-    save_to_npz(filename=filename, single_precision= False, inputs=inputs,
-                      results=yhat_details, metadata=metadata)
+    #save_to_npz(filename=filename, single_precision= False, inputs=inputs,
+                     # results=yhat_details, metadata=metadata)
     
-    return f"{filename}.npz generated"
+    #return f"{filename}.npz generated"
