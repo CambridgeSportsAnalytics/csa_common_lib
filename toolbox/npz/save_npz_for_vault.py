@@ -2,6 +2,7 @@ import json
 import requests
 import psr_lambda
 import numpy as np
+import boto3
 
 from .npz_io import save_to_npz
 
@@ -78,8 +79,21 @@ def save(api_key:str, filename:str, y, X, theta, yhat_details, Metadata:VaultMet
         }
 
         # Make the POST request to the endpoint
-        response = requests.post("https://v9spadcya3.execute-api.us-east-1.amazonaws.com/v1/vault", json=payload, headers={'x-api-key': f'{api_key}'})
         
+        
+        #return response
+
+        # Convert payload to JSON string
+        payload_json = json.dumps(payload)
+
+        # Upload payload to S3
+        s3 = boto3.client('s3')
+        bucket_name = 'post-npz'
+        s3_key = f'vault_payloads/testing.json'
+        s3.put_object(Bucket=bucket_name, Key=s3_key, Body=payload_json)
+
+        response = requests.post("https://v9spadcya3.execute-api.us-east-1.amazonaws.com/v1/vault", json={'s3_key':str(s3_key)}, headers={'x-api-key': f'{api_key}'})
+
         return response
         
         """
