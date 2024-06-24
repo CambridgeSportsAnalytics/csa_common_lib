@@ -6,9 +6,8 @@ class PredictionOptions:
     Supports a master default list of all possible input options used by predict, maxfit and optvar.
     Some models overlap in input options but setting a parameter that is not used by a given model will
     not affect it.
-
-    See documentation for option definitions: {put gitbook link here}
     """
+
 
     def __init__(self, **kwargs):
         self.options = {
