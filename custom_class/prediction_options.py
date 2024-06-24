@@ -21,7 +21,8 @@ class PredictionOptions:
             'adj_fit_multiplier': 'K',
             'is_return_grid': False,
             'attribute_combi': None,
-            'k': None,
+            'max_iter':1_000_000,
+            'k': 1,
             'is_return_weights_grid': False,
             'threshold': None,
             'is_threshold_percent': True
