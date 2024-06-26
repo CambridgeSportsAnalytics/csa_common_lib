@@ -15,19 +15,20 @@ class PredictionOptions:
             'is_threshold_percent': True,
             'most_eval': True,
             'eval_type': 'relevance',
+            'adj_fit_multiplier': 'K',
             'cov_inv': None,
         }
-            
-        # Update attributes with any provided kwargs
-        if kwargs:
-            for key, value in kwargs.items():
-                super().__setattr__(key, value)  # Use super() to avoid calling custom __setattr__
+
+        # Update the options dictionary with any provided kwargs
+        self.options.update(kwargs)
+
 
     def __getattr__(self, name):
         # Check if 'options' is in self.__dict__ to avoid KeyError
         if 'options' in self.__dict__ and name in self.__dict__['options']:
             return self.__dict__['options'][name]
         raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
+
 
     def __setattr__(self, name, value):
         if name == "options":
@@ -37,9 +38,16 @@ class PredictionOptions:
         else:
             raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
 
+
     def display(self):
         for key, value in self.options.items():
             print(f"{key}: {value}")
+
+    
+    def __repr__(self):
+        class_type = str(type(self)).split(".")[-1].split("'")[0]
+        f"{class_type}\n{self.display()}\n"
+
 
     def init_from_dict(self, inputs):
         """ Accepts a dictionary of inputs and returns a PredictionOptions obj 
@@ -60,6 +68,7 @@ class PredictionOptions:
             if hasattr(self, key):
                 # Update corresponding attribute in options object to hold dictionary value
                 super().__setattr__(key, value)  # Use super() to avoid calling custom __setattr__
+
 
     def clone_with(self, **kwargs):
         """ Returns a clone of the passed PredictionOptions object with user-specified 
@@ -92,13 +101,10 @@ class MaxFitOptions(PredictionOptions):
             'threshold_range': (0, 1),
             'stepsize': 0.20,
             'objective': 'adjusted_fit',
-            'adj_fit_multiplier': 'K',
         })
         
-        # Update attributes with any provided kwargs
-        if kwargs:
-            for key, value in kwargs.items():
-                super(PredictionOptions, self).__setattr__(key, value)
+        # Update the options dictionary with any provided kwargs
+        self.options.update(kwargs)
 
 
 class OptVarOptions(MaxFitOptions):
@@ -117,9 +123,5 @@ class OptVarOptions(MaxFitOptions):
             'is_return_weights_grid': False,
         })
         
-        # Update attributes with any provided kwargs
-        if kwargs:
-            for key, value in kwargs.items():
-                super(MaxFitOptions, self).__setattr__(key, value)
-
-
+        # Update the options dictionary with any provided kwargs
+        self.options.update(kwargs)
