@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 
 class PredictionOptions:
@@ -51,12 +52,32 @@ class PredictionOptions:
         Returns:
             PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
         """
+
+        
         # Iterate through input dict key/value pairs
         for key, value in inputs.items():
             # If obj attribute matches key in input dict
             if hasattr(self, key):
                 # Update corresponding attribute in options object to hold dictionary value
                 super().__setattr__(key, value)  # Use super() to avoid calling custom __setattr__
+
+    def clone_with(self, **kwargs):
+        """ Returns a clone of the passed PredictionOptions object with user-specified 
+        attribute overwrites (via key value pairs)
+
+        Args:
+            key/value pair (attr/value): Attributes to overwrite in the cloned obj 
+            lambda function
+
+        Returns:
+            PredictionOptions:  PredictionOptions obj 
+        """
+
+
+        new_copy = copy.deepcopy(self)
+        for key, value in kwargs.items():
+            setattr(new_copy, key, value)
+        return new_copy
 
 
 class MaxFitOptions(PredictionOptions):
