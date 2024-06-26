@@ -8,23 +8,13 @@ class PredictionOptions:
     not affect it.
     """
 
-
     def __init__(self, **kwargs):
         self.options = {
-            'threshold_range': (0, 1),
-            'stepsize': 0.20,
+            'threshold': None,
+            'is_threshold_percent': True,
             'most_eval': True,
             'eval_type': 'relevance',
             'cov_inv': None,
-            'objective': 'adjusted_fit',
-            'adj_fit_multiplier': 'K',
-            'is_return_grid': False,
-            'attribute_combi': None,
-            'max_iter':1_000_000,
-            'k': 1,
-            'is_return_weights_grid': False,
-            'threshold': None,
-            'is_threshold_percent': True
         }
             
         # Update attributes with any provided kwargs
@@ -61,10 +51,54 @@ class PredictionOptions:
         Returns:
             PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
         """
-
         # Iterate through input dict key/value pairs
         for key, value in inputs.items():
             # If obj attribute matches key in input dict
             if hasattr(self, key):
                 # Update corresponding attribute in options object to hold dictionary value
                 super().__setattr__(key, value)  # Use super() to avoid calling custom __setattr__
+
+
+class MaxFitOptions(PredictionOptions):
+    """
+    MaxFitOptions Class:
+    Inherits from PredictionOptions and adds additional options.
+    """
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.options.update({
+            'threshold_range': (0, 1),
+            'stepsize': 0.20,
+            'objective': 'adjusted_fit',
+            'adj_fit_multiplier': 'K',
+        })
+        
+        # Update attributes with any provided kwargs
+        if kwargs:
+            for key, value in kwargs.items():
+                super(PredictionOptions, self).__setattr__(key, value)
+
+
+class OptVarOptions(MaxFitOptions):
+    """
+    OptVarOptions Class:
+    Inherits from MaxFitOptions and adds additional options.
+    """
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.options.update({
+            'attribute_combi': None,
+            'max_iter': 1_000_000,
+            'k': 1,
+            'is_return_grid': False,
+            'is_return_weights_grid': False,
+        })
+        
+        # Update attributes with any provided kwargs
+        if kwargs:
+            for key, value in kwargs.items():
+                super(MaxFitOptions, self).__setattr__(key, value)
+
+
