@@ -3,3 +3,5 @@ from .prediction_options import MaxFitOptions
 from .prediction_options import OptVarOptions
 
 from .vault_metadata import VaultMetadata
+
+from .prediction_results import PredictionResults
