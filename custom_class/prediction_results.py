@@ -51,6 +51,14 @@ class PredictionResults:
         return df
 
 
+    def attributes(self):
+        attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]
+        print("Results Attributes:")
+        for attribute in attribute_list:
+            print(f"  .{attribute}")
+
+    
+    # TODO --> Change repr to display Davids core summary stats so the user can immediately assess the results before digging deeper. 
     def __repr__(self):
         class_name = self.__class__.__name__
         attributes = "\n".join(f"- {key}" for key, value in self.__dict__.items())
