@@ -8,58 +8,31 @@ class PredictionResults:
     """
 
     def __init__(self, results):
-        self.yhat = None
-        self.weights = None
-        self.weights_excluded = None
-        self.relevance = None
-        self.similarity = None
-        self.info_x = None
-        self.info_theta = None
-        self.include = None
-        self.lambda_sq = None
-        self.n = None
-        self.K = None
-        self.phi = None
-        self.r_star = None
-        self.r_star_percent = None
-        self.most_eval = None
-        self.eval_type = None
-        self.adjusted_fit = None
-        self.fit = None
-        self.rho = None
-        self.agreement = None
-        self.outlier_influence = None
-        self.asymmetry = None
-        self.y_linear = None
-        self.raw_data = None
+        self.raw_data = results
+        self._initialize_attributes()
 
-        self.flatten_and_store(results)
+    def _initialize_attributes(self):
+        allowed_keys = [
+            'yhat', 'weights', 'weights_excluded', 'relevance', 'similarity',
+            'info_x', 'info_theta', 'include', 'lambda_sq', 'n', 'K', 'phi',
+            'r_star', 'r_star_percent', 'most_eval', 'eval_type', 'adjusted_fit',
+            'fit', 'rho', 'agreement', 'outlier_influence', 'asymmetry', 'y_linear'
+        ]
 
-    def flatten_and_store(self, results):
-        setattr(self,"raw_data",results)
-
-        for result in results:
-            for key, value in result.items():
-                if isinstance(value, list) and len(value) == 1:
-                    setattr(self, key, value[0])  # Flatten single-element list to scalar
-                elif isinstance(value, list):
-                    getattr(self, key).append(value)  # Store lists as-is
-                else:
-                    setattr(self, key, value)  # Store non-list values as-is
-
-        # Convert attributes with shape (1, n) to flat arrays
-        for attr in dir(self):
-            if not attr.startswith('__') and not callable(getattr(self, attr)):
-                value = getattr(self, attr)
-                if isinstance(value, np.ndarray) and value.shape[0] == 1:
-                    setattr(self, attr, np.squeeze(value))
+        for key in allowed_keys:
+            values = []
+            for item in self.raw_data:
+                if key in item:
+                    value = item[key]
+                    if isinstance(value, np.ndarray) and value.shape == (1, 1):
+                        value = value[0][0]
+                    values.append(value)
+            setattr(self, key, values)
 
     def display(self):
         for attr in dir(self):
             if not attr.startswith('__') and not callable(getattr(self, attr)):
                 print(f"{attr}: {getattr(self, attr)}")
-
-
     def __repr__(self):
         class_name = self.__class__.__name__
         attributes = "\n".join(f"- {key}" for key, value in self.__dict__.items())
