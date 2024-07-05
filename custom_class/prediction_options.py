@@ -101,6 +101,7 @@ class MaxFitOptions(PredictionOptions):
             'threshold_range': (0, 1),
             'stepsize': 0.20,
             'objective': 'adjusted_fit',
+            'is_return_grid': False,
         })
         
         # Update the options dictionary with any provided kwargs
@@ -119,7 +120,6 @@ class OptVarOptions(MaxFitOptions):
             'attribute_combi': None,
             'max_iter': 1_000_000,
             'k': 1,
-            'is_return_grid': False,
             'is_return_weights_grid': False,
         })
         
