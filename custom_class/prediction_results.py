@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
+#import statsmodels.api as sm
+from csa_common_lib.toolbox.stats import summary
 
 class PredictionResults:
     """
@@ -91,6 +92,10 @@ class PredictionResults:
         for attribute in attribute_list:
             print(f"  .{attribute}")
 
+
+    def lin_comp(self, y_actuals):
+        data = summary.rbp_linear_component(self.y_linear, self.yhat, y_actuals)
+        print("Linear component analysis: \n", data)
     
     # TODO --> Change repr to be simpler
     def __repr__(self):
