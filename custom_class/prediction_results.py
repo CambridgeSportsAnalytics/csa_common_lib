@@ -3,6 +3,7 @@ import pandas as pd
 #import statsmodels.api as sm
 from csa_common_lib.toolbox.stats import summary
 
+
 class PredictionResults:
     """
     Prediction Results Class:
@@ -39,7 +40,7 @@ class PredictionResults:
                 print(f"{attr}: {getattr(self, attr)}")
 
 
-    def head(self, y_actuals=None):
+    def head(self):
         """
         Returns a printout summary of individual yhat_details values
 
@@ -56,36 +57,6 @@ class PredictionResults:
         })
 
         df['yhat_nonlin'] = df['yhat'] - df['y_linear']
-
-        # If y_actuals are supplied, we generate t-stats as well
-        if y_actuals is not None:
-            # Flatten ndarray and convert to regular array
-            if isinstance(y_actuals, np.ndarray):
-                y_actuals = y_actuals.flatten().tolist()
-
-            if isinstance(y_actuals, pd.Series):
-                y_actuals = y_actuals.astype(int).tolist()    
-
-            # Check dimensions to ensure y_actual matches
-            if len(y_actuals) != len(self.yhat) or len(y_actuals) != len(self.y_linear):
-                raise Exception("y_actual dimensions do not match y_hat and/or y_linear")
-            
-
-            #### PROTOTYPING Replace tstats lib call below with our own function that will go in the csa_common_lib.toolbox.stats module isntead
-            """
-            # Perform regression and calculate t-stats
-            X = sm.add_constant(df[['y_linear', 'yhat_nonlin']])
-
-            # Set y_actuals as a constant and model
-            model = sm.OLS(y_actuals, X)
-            results = model.fit()
-
-            # Retrieve t-stats
-            t_stats = results.tvalues
-
-            print("T-Statistics:")
-            print(t_stats)
-            """
 
         print(df.head())
         return df
