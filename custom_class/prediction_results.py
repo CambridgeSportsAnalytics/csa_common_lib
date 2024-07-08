@@ -40,6 +40,11 @@ class PredictionResults:
 
 
     def head(self, y_actuals=None):
+        """
+        Returns a printout summary of individual yhat_details values
+
+        """
+
 
         df = pd.DataFrame({
             'yhat': self.yhat,
@@ -87,6 +92,12 @@ class PredictionResults:
 
 
     def attributes(self):
+        """
+        Returns a list of all accessible attributes in the class
+
+        """
+
+
         attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]
         print("Results Attributes:")
         for attribute in attribute_list:
@@ -94,9 +105,17 @@ class PredictionResults:
 
 
     def lin_comp(self, y_actuals):
+        """Generates a summary of the influence of linear and non linear components
+        in the prediction results
+
+        Args:
+            y_actuals (pandas series): Pandas series of correct prediction results 
+                extracted from initial dataset to assess accuracy of the predictions
+        """
         data = summary.rbp_linear_component(self.y_linear, self.yhat, y_actuals)
         print("Linear component analysis: \n", data)
     
+
     # TODO --> Change repr to be simpler
     def __repr__(self):
         class_name = self.__class__.__name__
