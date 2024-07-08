@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+
 
 class VaultMetadata:
     """
@@ -20,12 +22,18 @@ class VaultMetadata:
         # Update attributes with any provided kwargs
         if kwargs:
             for key, value in kwargs.items():
+                # Convert any pandas references in a list we can parse
+                if isinstance(value, pd.Series):
+                    value = value.tolist()
+
                 self.__setattr__(key, value)
+
 
     def __getattr__(self, name):
         if name in self.metadata:
             return self.metadata[name]
         raise AttributeError(f"'VaultMetadata' object has no attribute '{name}'")
+
 
     def __setattr__(self, name, value):
         if name == "metadata":
@@ -35,9 +43,11 @@ class VaultMetadata:
         else:
             raise AttributeError(f"'VaultMetadata' object has no attribute '{name}'")
 
+
     def display(self):
         for key, value in self._metadata.items():
             print(f"{key}: {value}")
+
 
     def init_from_dict(self, inputs):
         """ Accepts a dictionary of inputs and returns a VaultMetadata obj 
