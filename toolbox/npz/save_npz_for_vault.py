@@ -52,6 +52,9 @@ def save(api_key:str, filename:str, y, X, theta, Results:PredictionResults, Meta
         Status printout and .npz file
     """
 
+
+    print("Preparing data...")
+
     # Set raw prediction data to a variable 
     yhat_details = Results.raw_data
 
@@ -90,32 +93,14 @@ def save(api_key:str, filename:str, y, X, theta, Results:PredictionResults, Meta
         bucket_name = 'post-vault'
         s3_key = f'vault_payloads/testing.json'
         s3.put_object(Bucket=bucket_name, Key=s3_key, Body=payload_json)
-        print("s3 file successfully generated. Waiting for response from post-vault")
+        print("S3 file successfully generated. Waiting for response from post-vault")
 
         response = requests.post("https://v9spadcya3.execute-api.us-east-1.amazonaws.com/v1/vault", json={'s3_key':str(s3_key)}, headers={'x-api-key': f'{api_key}'})
 
+        if response.status_code == 200:
+            print("Data successfully uploaded to vault")
+        elif response.status_code ==202:
+            print("Experiment data already exists in vault")
+
         return response
-        
-        """
-        # Check that metadata post wrapper returns the data we need for saving
-        if metadata_ids['pointers']:
-            metadata_ids = json.loads(metadata_response)['pointers']
-
-            # Check that metadata id arrays are not empty
-            if len(metadata_ids['observations']) > 0 and metadata_ids['y_metric']:
-
-                # Overwrite metadata fields with reference ids before packaging
-                Metadata.observations = metadata_ids['observations']
-                Metadata.y_metric = metadata_ids['y_metric']
-            else:
-                raise ValueError("Returned metadata list was empty")
-        else:
-            raise ValueError("Vault metadata not returned")
-        """
-    # Package metadata
-    #metadata = class_obj_to_dict(Metadata)['metadata']
-
-    #save_to_npz(filename=filename, single_precision= False, inputs=inputs,
-                     # results=yhat_details, metadata=metadata)
     
-    #return f"{filename}.npz generated"
