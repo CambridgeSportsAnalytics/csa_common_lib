@@ -42,7 +42,7 @@ class PredictionResults:
 
     def head(self):
         """
-        Returns a printout summary of individual yhat_details values
+        Returns a printout summary of basic yhat_details values
 
         """
 
