@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 def convert_to_float32(obj):
@@ -29,3 +30,22 @@ def convert_to_float32(obj):
             # Return the object as-is if it cannot be converted.
             return obj
     
+
+def convert_dict_to_list(obj):
+    """
+    Recursively converts numpy arrays and pandas Series in the dictionary
+    to lists. It handles nested dictionaries and lists as well.
+    """
+    if isinstance(obj, dict):
+        return {k: convert_dict_to_list(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_dict_to_list(item) for item in obj]
+    elif isinstance(obj, np.ndarray):
+        # Convert the numpy array to a list
+        return obj.tolist()
+    elif isinstance(obj, pd.Series):
+        # Convert the pandas Series to a list
+        return obj.tolist()
+    else:
+        # Return the object if it's not a dict, list, np.ndarray, or pd.Series
+        return obj

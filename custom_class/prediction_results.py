@@ -1,7 +1,14 @@
 import numpy as np
 import pandas as pd
-#import statsmodels.api as sm
+
 from csa_common_lib.toolbox.stats import summary
+
+from csanalytics_local.db_local.controller import connect
+from csanalytics_local import vault_upload
+
+from csa_common_lib.custom_class.vault_metadata import VaultMetadata
+from csa_common_lib.custom_class.prediction_options import PredictionOptions
+from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
 
 
 class PredictionResults:
@@ -92,3 +99,18 @@ class PredictionResults:
         class_name = self.__class__.__name__
         attributes = "\n".join(f"- {key}" for key, value in self.__dict__.items())
         return f"\nResults:\n--------- \n{attributes}\n--------- "
+    
+
+    def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
+        #### get close connection function from _controller
+        
+        # Establish a connection with the database
+        connection = connect(db_username, db_password)
+
+        foreign_keys = vault_upload.post_vault_metadata(connection=connection, X=X, y=y, metadata=metadata)
+
+        resp = vault_upload.post_vault_results(connection=connection, results=self.raw_data, options=class_obj_to_dict(options),
+                                              foreign_keys = foreign_keys, metadata=class_obj_to_dict(metadata), theta=theta)
+
+
+        print(resp)
