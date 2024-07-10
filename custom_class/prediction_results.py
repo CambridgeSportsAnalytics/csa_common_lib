@@ -1,11 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from csa_common_lib.toolbox.stats import summary
-
 from csanalytics_local.db_local.controller import connect
 from csanalytics_local import vault_upload
 
+from csa_common_lib.toolbox.stats import summary
 from csa_common_lib.custom_class.vault_metadata import VaultMetadata
 from csa_common_lib.custom_class.prediction_options import PredictionOptions
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
@@ -90,12 +89,27 @@ class PredictionResults:
             y_actuals (pandas series): Pandas series of correct prediction results 
                 extracted from initial dataset to assess accuracy of the predictions
         """
+
+
         data = summary.rbp_linear_component(self.y_linear, self.yhat, y_actuals)
         print("Linear component analysis: \n", data)
     
 
     def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
-        
+        """Saves experiment data to the vault_results database along with Metadata
+        needed to display the raw information
+
+        Args:
+            X (np.ndarray, pd.Series or list): X input that was used to generate prediction results
+            y (np.ndarray, pd.Series or list): y input that was used to generate prediction results
+            theta (np.ndarray, pd.Series or list): theta matrix input that was used to generate prediction results
+            metadata (VaultMetadata): Supporting information to make prediction data readable
+            options (PredictionOptions): Optional parameter inputted into the prediction model
+            db_username (str): Username used to access csa database
+            db_password (str): Password used to access csa database
+        """
+
+
         # Establish a connection with the database
         connection = connect(db_username, db_password)
 
