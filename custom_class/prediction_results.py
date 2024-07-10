@@ -27,7 +27,10 @@ class PredictionResults:
             'yhat', 'weights', 'weights_excluded', 'relevance', 'similarity',
             'info_x', 'info_theta', 'include', 'lambda_sq', 'n', 'K', 'phi',
             'r_star', 'r_star_percent', 'most_eval', 'eval_type', 'adjusted_fit',
-            'fit', 'rho', 'agreement', 'outlier_influence', 'asymmetry', 'y_linear'
+            'fit', 'rho', 'agreement', 'outlier_influence', 'asymmetry', 'y_linear',
+            'yhat_grid', 'weights_grid', 'adjusted_fit_grid', 'max_attributes',
+            'combi_grid', 'yhat_compound', 'adjusted_fit_compound', 'combi_compound',
+            'weights_compound', 'fit_compound'
         ]
 
         for key in allowed_keys:
@@ -45,6 +48,16 @@ class PredictionResults:
         for attr in dir(self):
             if not attr.startswith('__') and not callable(getattr(self, attr)):
                 print(f"{attr}: {getattr(self, attr)}")
+
+    
+    def __repr__(self):
+        """
+        Displays a list of all accessible attributes in the class
+
+        """
+        class_name = self.__class__.__name__
+        attributes = "\n".join(f"- {key}" for key in self.raw_data[0].keys())
+        return f"\nResults:\n--------- \n{attributes}\n--------- "
 
 
     def head(self):
@@ -69,19 +82,6 @@ class PredictionResults:
         return df
 
 
-    def attributes(self):
-        """
-        Returns a list of all accessible attributes in the class
-
-        """
-
-
-        attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]
-        print("Results Attributes:")
-        for attribute in attribute_list:
-            print(f"  .{attribute}")
-
-
     def lin_comp(self, y_actuals):
         """Generates a summary of the influence of linear and non linear components
         in the prediction results
@@ -92,13 +92,6 @@ class PredictionResults:
         """
         data = summary.rbp_linear_component(self.y_linear, self.yhat, y_actuals)
         print("Linear component analysis: \n", data)
-    
-
-    # TODO --> Change repr to be simpler
-    def __repr__(self):
-        class_name = self.__class__.__name__
-        attributes = "\n".join(f"- {key}" for key, value in self.__dict__.items())
-        return f"\nResults:\n--------- \n{attributes}\n--------- "
     
 
     def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
