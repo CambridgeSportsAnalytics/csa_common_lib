@@ -16,6 +16,11 @@ def rbp_linear_component(y_linear:list, yhats:list, y_actuals):
         data: Dataframe containing component influences
     """
     
+    if len(yhats) != len(y_linear):
+        raise Exception("len(yhats) does not match len(y_linear)")
+    if len(y_linear) != len(y_actuals):
+        raise Exception("len(y_linear) does not match len(y_actuals)")
+
 
     df = pd.DataFrame({
             'yhat': yhats,

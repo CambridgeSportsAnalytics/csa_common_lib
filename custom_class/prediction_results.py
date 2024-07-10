@@ -102,7 +102,6 @@ class PredictionResults:
     
 
     def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
-        #### get close connection function from _controller
         
         # Establish a connection with the database
         connection = connect(db_username, db_password)
