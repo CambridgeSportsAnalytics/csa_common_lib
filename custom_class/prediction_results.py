@@ -35,7 +35,12 @@ class PredictionResults:
         if not self.raw_data:
             return
         
-        first_item = self.raw_data[0]
+        if isinstance(self.raw_data, dict):
+            first_item = self.raw_data
+            self.raw_data = [self.raw_data]
+        else:
+            first_item = self.raw_data[0]
+
         if not isinstance(first_item, dict):
             raise TypeError("Items in raw_data must be dictionaries")
         
