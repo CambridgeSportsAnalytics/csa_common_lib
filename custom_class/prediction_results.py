@@ -141,3 +141,28 @@ class PredictionResults:
 
 
         print(resp)
+
+    
+        
+    def model_analysis(self, y_actuals, X_cols):
+        
+
+        # Run analysis
+        analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
+                               fits=self.fit, combi_grid=self.combi_compound, X_cols=X_cols)
+        
+        analysis_names = ["y Actual Mean: \n","Informativeness Weighted Co-occurence: \n",
+                          "Linear Component Analysis: \n","Variable Importance: \n"]
+
+        # Printout summary
+        index = 0
+
+        print("--------------\nSUMMARY STATS: \n")
+        for analysis in analysis_list:
+            print(analysis_names[index])
+            print(analysis)
+            index += 1
+            print("\n")
+        print("--------------")
+        # Return list of pandas tables containing summary data. *Not required to see stats
+        return analysis_list
