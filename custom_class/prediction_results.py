@@ -100,20 +100,6 @@ class PredictionResults:
 
         print(df.head())
         return df
-
-
-    def lin_comp(self, y_actuals):
-        """Generates a summary of the influence of linear and non linear components
-        in the prediction results
-
-        Args:
-            y_actuals (pandas series): Pandas series of correct prediction results 
-                extracted from initial dataset to assess accuracy of the predictions
-        """
-
-
-        data = summary.rbp_linear_component(self.y_linear, self.yhat, y_actuals)
-        print("Linear component analysis: \n", data)
     
 
     def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
@@ -149,7 +135,7 @@ class PredictionResults:
 
         # Run analysis
         analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
-                               fits=self.fit, combi_grid=self.combi_compound, X_cols=X_cols)
+                               fits=self.fit, combi_compound=self.combi_compound, X_cols=X_cols)
         
         analysis_names = ["y Actual Mean: \n","Informativeness Weighted Co-occurence: \n",
                           "Linear Component Analysis: \n","Variable Importance: \n"]
@@ -164,5 +150,6 @@ class PredictionResults:
             index += 1
             print("\n")
         print("--------------")
+
         # Return list of pandas tables containing summary data. *Not required to see stats
         return analysis_list
