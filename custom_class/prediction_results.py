@@ -21,6 +21,7 @@ class PredictionResults:
         self.raw_data = results
         self._initialize_attributes()
 
+
     def _initialize_attributes(self):
         allowed_keys = [
             'yhat', 'weights', 'weights_excluded', 'relevance', 'similarity',
@@ -56,6 +57,7 @@ class PredictionResults:
                     values.append(value)
             setattr(self, key, values)
 
+
     def attributes(self):
         """
         Returns a list of all accessible attributes in the class
@@ -63,6 +65,7 @@ class PredictionResults:
 
         attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]
         return attribute_list
+
 
     def display(self):
         for attr in dir(self):
@@ -131,7 +134,16 @@ class PredictionResults:
     
         
     def model_analysis(self, y_actuals, X_cols):
-        
+        """Prints and returns tables of summary statistics of a given set of PredictionResults
+
+        Args:
+            y_actuals (pd.Series): Actual values (to be compared to yhats)
+            X_cols (list): Array of variable (column) names
+
+        Returns:
+            analysis_list : Array of model_analysis tables 
+                (y Actual Mean, Informativeness Weighted Co-occurence, Linear Component Analysis, Variable Importance)
+        """
 
         # Run analysis
         analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
