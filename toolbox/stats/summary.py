@@ -349,7 +349,7 @@ def ifwco_table(yhats:list, y_actuals:pd.Series, fits:list, percentile_low:int=2
                'Full Sample' : full_sample,
                'High Fit' : high_fit,
                'Low Fit' : low_fit,
-               'High Predicton' : high_pred,
+               'High Prediction' : high_pred,
                'High Prediction w/ High Fit' : high_pred_w_high_fit,
                'High Prediction w/ Low Fit' : high_pred_w_low_fit,
                'Low Prediction' : low_pred,
