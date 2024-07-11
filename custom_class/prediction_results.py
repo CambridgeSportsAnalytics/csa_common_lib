@@ -32,7 +32,21 @@ class PredictionResults:
             'weights_compound', 'fit_compound'
         ]
 
-        for key in allowed_keys:
+        if not self.raw_data:
+            return
+        
+        if isinstance(self.raw_data, dict):
+            first_item = self.raw_data
+            self.raw_data = [self.raw_data]
+        else:
+            first_item = self.raw_data[0]
+
+        if not isinstance(first_item, dict):
+            raise TypeError("Items in raw_data must be dictionaries")
+        
+        keys_to_populate = [key for key in first_item if key in allowed_keys]
+
+        for key in keys_to_populate:
             values = []
             for item in self.raw_data:
                 if key in item:
@@ -42,6 +56,13 @@ class PredictionResults:
                     values.append(value)
             setattr(self, key, values)
 
+    def attributes(self):
+        """
+        Returns a list of all accessible attributes in the class
+        """
+
+        attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]
+        return attribute_list
 
     def display(self):
         for attr in dir(self):
