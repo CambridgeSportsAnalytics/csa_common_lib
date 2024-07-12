@@ -11,7 +11,7 @@ class PredictionOptions:
 
     def __init__(self, **kwargs):
         self.options = {
-            'threshold': None,
+            'threshold': [0],
             'is_threshold_percent': True,
             'most_eval': True,
             'eval_type': 'relevance',
@@ -98,6 +98,7 @@ class MaxFitOptions(PredictionOptions):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.options.update({
+            'threshold': None,
             'threshold_range': (0, 1),
             'stepsize': 0.20,
             'objective': 'adjusted_fit',
