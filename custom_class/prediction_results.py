@@ -8,6 +8,7 @@ from csa_common_lib.toolbox.stats import summary
 from csa_common_lib.custom_class.vault_metadata import VaultMetadata
 from csa_common_lib.custom_class.prediction_options import PredictionOptions
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
+from csa_common_lib.toolbox.stats.stats_to_excel import create_excel_sheet
 
 
 class PredictionResults:
@@ -145,6 +146,9 @@ class PredictionResults:
                 (y Actual Mean, Informativeness Weighted Co-occurence, Linear Component Analysis, Variable Importance)
         """
 
+        if not hasattr(self, 'combi_compound'):
+            raise Exception("Attribute: combi_compound required to model analysis results.\nPlease set is_return_grid=True in your prediction options")
+
         # Run analysis
         analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
                                fits=self.fit, combi_compound=self.combi_compound, X_cols=X_cols)
@@ -165,3 +169,16 @@ class PredictionResults:
 
         # Return list of pandas tables containing summary data. *Not required to see stats
         return analysis_list
+    
+
+    def save_to_excel(self, y_actuals, X_cols, outcome_labels, filepath:str):
+
+        if not hasattr(self, 'combi_compound'):
+            raise Exception("Attribute: combi_compound required to model analysis results.\nPlease set is_return_grid=True in your prediction options")
+
+        # Run analysis
+        analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
+                               fits=self.fit, combi_compound=self.combi_compound, X_cols=X_cols)
+        
+        create_excel_sheet.generate_workbook(analysis_list, filepath, self , outcome_labels, y_actuals)
+        
