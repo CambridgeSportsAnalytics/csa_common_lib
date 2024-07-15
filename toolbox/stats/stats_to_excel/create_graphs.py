@@ -152,3 +152,34 @@ def variable_importance_graph(data,filepath):
     
     return(plot_file)
 
+def heatmap_graph(data,test_set_names,X_cols,filepath):
+    """
+    Creates a heatmap of variable importance.
+    """
+    #Set up dataframe
+    combi_compound = pd.DataFrame(np.vstack(data),index=test_set_names)
+    combi_compound.columns = X_cols 
+    
+    #Melt the data to get in plottable form
+    data_melt = combi_compound.reset_index().melt(id_vars=combi_compound.index.name,var_name='Variable',value_name="Value")
+    data_melt.columns = ['index','Variable','Weight']
+    
+    #Sort order by median values of each variable
+    median_values = data_melt.groupby('Variable')['Weight'].median().sort_values(ascending=False)
+    data_melt['Variable'] = pd.Categorical(data_melt['Variable'],categories=median_values.index,ordered=True)
+    
+    #Make the heatmap
+    plot = (ggplot(data_melt,aes(x='index',y='Variable',fill='Weight')) + #set up x, y, fill
+                  geom_tile() +  #create heatmap
+                  scale_fill_gradient2(low='red',mid='white',high='green',midpoint=np.median(data_melt['Weight'])) + #set fill scale
+                  theme(axis_text_x = element_blank(), #no x axis text
+                        axis_ticks_major_x = element_blank(), #no x axis ticks
+                        axis_text_y=element_text(size=8)) + #y axis smaller font size to fit all variables
+                  labs(x='',y='',title='') #turn off titles
+            )
+    
+    #save image to file
+    plot_file = f"{filepath}\\variable_heatmap.png"
+    plot.save(plot_file,width=12,height=8)
+    
+    return(plot_file)

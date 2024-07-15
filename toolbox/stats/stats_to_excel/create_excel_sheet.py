@@ -253,7 +253,6 @@ def create_y_actual_means(workbook,df, result_path,high_percentile_value=0.80, l
     img = Image(graph_path)
     sheet.add_image(img,'H1')
 
-
 # Create the co-occurrence sheet
 def create_co_occurrence(workbook, df, result_path, high_percentile_value=0.80, low_percentile_value=0.20):
     """
@@ -532,7 +531,6 @@ def create_co_occurrence(workbook, df, result_path, high_percentile_value=0.80, 
     img = Image(graph_path)
     sheet.add_image(img,'H3')
 
-
 # Function to create the betas and t statistics sheet
 def betas_and_t_statistics(workbook, df):
     """
@@ -690,7 +688,6 @@ def betas_and_t_statistics(workbook, df):
     for cell in numeric_cells:
         sheet[cell].number_format = '0.00'
 
-
 def variable_importance(workbook,df,result_path):
     """
     Creates the variable importance table.
@@ -770,9 +767,21 @@ def variable_importance(workbook,df,result_path):
     letter = get_column_letter(insert_col)
     
     sheet.add_image(img,f'{letter}2')
+    
+def heatmap(workbook,df,test_set_names, X_cols,result_path):
+    """
+    Creates the variable importance heatmap.
+    """    
+    #Create sheet
+    sheet = workbook.create_sheet(title='heatmap')
+    
+    #add in plot
+    graph_path = heatmap_graph(df,test_set_names,X_cols,result_path)
+    img = Image(graph_path)
 
+    sheet.add_image(img,'A1')
 
-def generate_workbook(model_analysis,result_path,PredictionResults,test_set_names,y_actuals):
+def generate_workbook(model_analysis,result_path,PredictionResults,test_set_names,X_cols,y_actuals):
     """
     Creates the excel workbook
     """
@@ -781,11 +790,15 @@ def generate_workbook(model_analysis,result_path,PredictionResults,test_set_name
     default_sheet = workbook.active
     workbook.remove(default_sheet)
     
+
+    
     create_y_actual_means(workbook, model_analysis[0],result_path)
     create_co_occurrence(workbook, model_analysis[1],result_path)
     betas_and_t_statistics(workbook, model_analysis[2])
     variable_importance(workbook,model_analysis[3],result_path)
     test_set_statistics(workbook,PredictionResults,test_set_names,y_actuals)
+    heatmap(workbook,PredictionResults.combi_compound,test_set_names,X_cols,result_path)
+    
     
     workbook.save(f"{result_path}\\results.xlsx")
     

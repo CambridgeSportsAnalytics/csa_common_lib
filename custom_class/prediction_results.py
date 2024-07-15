@@ -180,5 +180,7 @@ class PredictionResults:
         analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
                                fits=self.fit, combi_compound=self.combi_compound, X_cols=X_cols)
         
-        create_excel_sheet.generate_workbook(analysis_list, filepath, self , outcome_labels, y_actuals)
+        create_excel_sheet.generate_workbook(analysis_list, result_path=filepath,
+                                              PredictionResults=self, X_cols=X_cols,
+                                              test_set_names=outcome_labels,y_actuals=y_actuals)
         
