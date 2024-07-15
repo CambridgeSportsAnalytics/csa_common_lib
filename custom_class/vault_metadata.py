@@ -16,7 +16,9 @@ class VaultMetadata:
             'product_id': None,
             'Xcol_labels': None,
             'Xrow_labels': None,
-            'outcome_labels': None
+            'outcome_labels': None,
+            'experiment_title': '',
+            'experiment_description': '',
         }
             
         # Update attributes with any provided kwargs
