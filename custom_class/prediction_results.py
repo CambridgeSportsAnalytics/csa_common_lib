@@ -21,6 +21,7 @@ class PredictionResults:
     def __init__(self, results):
         self.raw_data = results
         self._initialize_attributes()
+        self.weights_concentration = [np.std(row) for row in self.weights]
 
 
     def _initialize_attributes(self):
@@ -58,8 +59,6 @@ class PredictionResults:
                     values.append(value)
             setattr(self, key, values)
 
-        # compute weights concentration attribute
-        setattr(self,'weights_concentration',np.std(self.weights))
 
     def attributes(self):
         """
