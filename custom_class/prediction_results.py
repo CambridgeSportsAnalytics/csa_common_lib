@@ -58,6 +58,8 @@ class PredictionResults:
                     values.append(value)
             setattr(self, key, values)
 
+        # compute weights concentration attribute
+        setattr(self,'weights_concentration',np.std(self.weights))
 
     def attributes(self):
         """
