@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 
+from csanalytics_local.db_local.controller import connect
+from csanalytics_local.db_local.vault_commands import get_ids_by_names
+
+
 
 class VaultMetadata:
     """
@@ -93,3 +97,5 @@ class VaultMetadata:
         # Ensure all attributes are updated
         for key in self.metadata.keys():
             setattr(self, key, self.metadata[key])
+
+    
