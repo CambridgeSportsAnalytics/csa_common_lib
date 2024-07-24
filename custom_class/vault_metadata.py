@@ -24,6 +24,7 @@ class VaultMetadata:
             'experiment_title': '',
             'experiment_description': '',
             'img_urls': None,
+            'outcome_info': None
         }
             
         # Update attributes with any provided kwargs
