@@ -121,13 +121,28 @@ class PredictionResults:
             db_password (str): Password used to access csa database
         """
 
+        
+        df = pd.DataFrame(X)
+        rel_weights = df.apply(lambda row: row.nlargest(5).index.tolist(), axis=1)
 
+        self.relevant_weights = [[metadata.Xrow_labels[i] for i in row_indices] for row_indices in rel_weights]
+
+        matrices = self.combi_compound
+        top_labels_all_matrices = []
+        for matrix in matrices:
+            df_row = pd.Series(matrix[0])
+            top_indices = df_row.nlargest(5).index.tolist()
+            top_labels = [metadata.Xcol_labels[i] for i in top_indices]
+            top_labels_all_matrices.append(top_labels)
+
+        self.variable_importance = top_labels_all_matrices
+        
         # Establish a connection with the database
         connection = connect(db_username, db_password)
 
         foreign_keys = vault_upload.post_vault_metadata(connection=connection, X=X, y=y, metadata=metadata)
 
-        resp = vault_upload.post_vault_results(connection=connection, results=self.raw_data, options=class_obj_to_dict(options),
+        resp = vault_upload.post_vault_results(connection=connection, results=self, options=class_obj_to_dict(options),
                                               foreign_keys = foreign_keys, metadata=class_obj_to_dict(metadata), theta=theta)
 
 
