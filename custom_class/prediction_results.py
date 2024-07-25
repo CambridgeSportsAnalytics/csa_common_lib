@@ -122,10 +122,14 @@ class PredictionResults:
         """
 
         
-        df = pd.DataFrame(X)
-        rel_weights = df.apply(lambda row: row.nlargest(5).index.tolist(), axis=1)
+        
+        top_weights = []
+        for col in self.weights_compound:
+            df = pd.Series(col.flatten())
+            rel_weights = df.nlargest(5).index.tolist()
+            top_weights.append(rel_weights)
 
-        self.relevant_weights = [[metadata.Xrow_labels[i] for i in row_indices] for row_indices in rel_weights]
+        self.relevant_weights = [[metadata.Xrow_labels[i] for i in row_indices] for row_indices in top_weights]
 
         matrices = self.combi_compound
         top_labels_all_matrices = []
