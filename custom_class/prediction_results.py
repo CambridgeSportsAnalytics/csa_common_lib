@@ -105,23 +105,17 @@ class PredictionResults:
 
         print(df.head())
         return df
-    
 
-    def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
-        """Saves experiment data to the vault_results database along with Metadata
-        needed to display the raw information
+    
+    def generate_top_five(self, metadata):
+        """Generates top 5 relevant observations as well as top 5 most important
+        variables given input metadata and a results class containing weights_compound
 
         Args:
-            X (np.ndarray, pd.Series or list): X input that was used to generate prediction results
-            y (np.ndarray, pd.Series or list): y input that was used to generate prediction results
-            theta (np.ndarray, pd.Series or list): theta matrix input that was used to generate prediction results
-            metadata (VaultMetadata): Supporting information to make prediction data readable
-            options (PredictionOptions): Optional parameter inputted into the prediction model
-            db_username (str): Username used to access csa database
-            db_password (str): Password used to access csa database
+            metadata (VaultMetadata): Metadata class object containing row and column
+            names so we can label top five rankings
         """
 
-        
         
         top_weights = []
         for col in self.weights_compound:
@@ -140,6 +134,24 @@ class PredictionResults:
             top_labels_all_matrices.append(top_labels)
 
         self.variable_importance = top_labels_all_matrices
+    
+
+    def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
+        """Saves experiment data to the vault_results database along with Metadata
+        needed to display the raw information
+
+        Args:
+            X (np.ndarray, pd.Series or list): X input that was used to generate prediction results
+            y (np.ndarray, pd.Series or list): y input that was used to generate prediction results
+            theta (np.ndarray, pd.Series or list): theta matrix input that was used to generate prediction results
+            metadata (VaultMetadata): Supporting information to make prediction data readable
+            options (PredictionOptions): Optional parameter inputted into the prediction model
+            db_username (str): Username used to access csa database
+            db_password (str): Password used to access csa database
+        """
+
+
+        self.generate_top_five(metadata)
         
         # Establish a connection with the database
         connection = connect(db_username, db_password)
