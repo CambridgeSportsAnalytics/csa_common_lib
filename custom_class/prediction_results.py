@@ -21,7 +21,11 @@ class PredictionResults:
     def __init__(self, results):
         self.raw_data = results
         self._initialize_attributes()
+
+        # compute weights concentration and add to class
         self.weights_concentration = [np.std(row) for row in self.weights]
+        if hasattr(self, 'weights_compound'):
+            self.weights_concentration_compound = [np.std(row) for row in self.weights_compound]
 
 
     def _initialize_attributes(self):
@@ -116,7 +120,7 @@ class PredictionResults:
             names so we can label top five rankings
         """
 
-        
+
         top_weights = []
         for col in self.weights_compound:
             df = pd.Series(col.flatten())
