@@ -111,7 +111,7 @@ class PredictionResults:
         return df
 
     
-    def generate_top_five(self, metadata):
+    def generate_top_five(self, metadata:VaultMetadata):
         """Generates top 5 relevant observations as well as top 5 most important
         variables given input metadata and a results class containing weights_compound
 
