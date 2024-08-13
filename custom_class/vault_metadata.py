@@ -23,6 +23,7 @@ class VaultMetadata:
             'outcome_labels': None,
             'experiment_title': '',
             'experiment_description': '',
+            'experiment_img':None,
             'img_urls': None,
             'outcome_info': None
         }
