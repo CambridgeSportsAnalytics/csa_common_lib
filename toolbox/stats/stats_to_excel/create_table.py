@@ -1,14 +1,17 @@
-from openpyxl.utils import get_column_letter
-import pandas as pd
-import openpyxl
-from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
+
 import os
-import sys
-from openpyxl.formatting.rule import ColorScaleRule
-from openpyxl import Workbook
-from openpyxl.chart import BarChart, Reference, Series
-from openpyxl.chart.label import DataLabelList
-from openpyxl.drawing.image import Image
+
+if os.getenv('LAMBDA_ENV') == None:
+    from openpyxl.utils import get_column_letter
+    import pandas as pd
+    import openpyxl
+    from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
+    import sys
+    from openpyxl.formatting.rule import ColorScaleRule
+    from openpyxl import Workbook
+    from openpyxl.chart import BarChart, Reference, Series
+    from openpyxl.chart.label import DataLabelList
+    from openpyxl.drawing.image import Image
 
 def test_set_statistics(workbook,PredictionResults,test_set_names,y_actuals):
     """

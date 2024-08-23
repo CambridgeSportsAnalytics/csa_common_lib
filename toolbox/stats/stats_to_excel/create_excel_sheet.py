@@ -1,11 +1,14 @@
-from openpyxl.utils import get_column_letter
-import openpyxl
-from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
+
 import os
-from openpyxl.formatting.rule import ColorScaleRule
-from openpyxl.drawing.image import Image
-from .create_graphs import *
-from .create_table import *
+
+if os.getenv('LAMBDA_ENV') == None:
+    from openpyxl.utils import get_column_letter
+    import openpyxl
+    from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
+    from openpyxl.formatting.rule import ColorScaleRule
+    from openpyxl.drawing.image import Image
+    from .create_graphs import *
+    from .create_table import *
 
 
 # Function to create the y_actual_means sheet

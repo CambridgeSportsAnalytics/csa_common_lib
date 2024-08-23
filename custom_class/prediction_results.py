@@ -1,14 +1,18 @@
 import numpy as np
 import pandas as pd
+import os
 
-from csanalytics_local.db_local.controller import connect
-from csanalytics_local import vault_upload
+if os.getenv('LAMBDA_ENV') == None:
+    from csanalytics_local.db_local.controller import connect
+    from csanalytics_local import vault_upload
+    from csa_common_lib.toolbox.stats.stats_to_excel import create_excel_sheet
+    from csa_common_lib.toolbox.stats import summary
 
-from csa_common_lib.toolbox.stats import summary
+
 from csa_common_lib.custom_class.vault_metadata import VaultMetadata
 from csa_common_lib.custom_class.prediction_options import PredictionOptions
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
-from csa_common_lib.toolbox.stats.stats_to_excel import create_excel_sheet
+
 
 
 class PredictionResults:
@@ -162,8 +166,8 @@ class PredictionResults:
 
         foreign_keys = vault_upload.post_vault_metadata(connection=connection, X=X, y=y, metadata=metadata)
 
-        resp = vault_upload.post_vault_results(connection=connection, results=self, options=class_obj_to_dict(options),
-                                              foreign_keys = foreign_keys, metadata=class_obj_to_dict(metadata), theta=theta)
+        resp = vault_upload.post_vault_results(connection = connection, results = self, options=class_obj_to_dict(options),
+                                              foreign_keys = foreign_keys, metadata = class_obj_to_dict(metadata), theta = theta)
 
 
         print(resp)
