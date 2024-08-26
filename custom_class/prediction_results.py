@@ -166,6 +166,7 @@ class PredictionResults:
 
         foreign_keys = vault_upload.post_vault_metadata(connection=connection, X=X, y=y, metadata=metadata)
 
+        
         resp = vault_upload.post_vault_results(connection = connection, results = self, options=class_obj_to_dict(options),
                                               foreign_keys = foreign_keys, metadata = class_obj_to_dict(metadata), theta = theta)
 
