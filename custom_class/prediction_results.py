@@ -3,8 +3,11 @@ import pandas as pd
 import os
 
 if os.getenv('LAMBDA_ENV') == None:
+    # Only import on local system, not relevant on lambda calls
     from csanalytics_local.db_local.controller import connect
     from csanalytics_local import vault_upload
+
+    # conditional import because these modules use external imports to generate stats
     from csa_common_lib.toolbox.stats.stats_to_excel import create_excel_sheet
     from csa_common_lib.toolbox.stats import summary
 
@@ -173,9 +176,6 @@ class PredictionResults:
 
         print(resp)
 
-
-
-    
         
     def model_analysis(self, y_actuals, X_cols):
         """Prints and returns tables of summary statistics of a given set of PredictionResults
@@ -226,4 +226,4 @@ class PredictionResults:
         create_excel_sheet.generate_workbook(analysis_list, result_path=filepath,
                                               PredictionResults=self, X_cols=X_cols,
                                               test_set_names=outcome_labels,y_actuals=y_actuals)
-        
+    
