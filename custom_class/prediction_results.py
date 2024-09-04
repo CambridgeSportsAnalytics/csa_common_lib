@@ -1,22 +1,5 @@
 import numpy as np
 import pandas as pd
-import os
-
-if os.getenv('LAMBDA_ENV') == None:
-    # Only import on local system, not relevant on lambda calls
-    from csanalytics_local.db_local.controller import connect
-    from csanalytics_local import vault_upload
-
-    # conditional import because these modules use external imports to generate stats
-    from csa_common_lib.toolbox.stats.stats_to_excel import create_excel_sheet
-    from csa_common_lib.toolbox.stats import summary
-
-
-from csa_common_lib.custom_class.vault_metadata import VaultMetadata
-from csa_common_lib.custom_class.prediction_options import PredictionOptions
-from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict
-
-
 
 class PredictionResults:
     """
@@ -33,7 +16,6 @@ class PredictionResults:
         self.weights_concentration = [np.std(row) for row in self.weights]
         if hasattr(self, 'weights_compound'):
             self.weights_concentration_compound = [np.std(row) for row in self.weights_compound]
-
 
     def _initialize_attributes(self):
         allowed_keys = [
@@ -70,7 +52,6 @@ class PredictionResults:
                     values.append(value)
             setattr(self, key, values)
 
-
     def attributes(self):
         """
         Returns a list of all accessible attributes in the class
@@ -79,37 +60,29 @@ class PredictionResults:
         attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]
         return attribute_list
 
-
     def display(self):
         for attr in dir(self):
             if not attr.startswith('__') and not callable(getattr(self, attr)):
                 print(f"{attr}: {getattr(self, attr)}")
 
-    
     def __repr__(self):
         """
         Displays a list of all accessible attributes in the class
-
         """
         class_name = self.__class__.__name__
         attributes = "\n".join(f"- {key}" for key in self.raw_data[0].keys())
         return f"\nResults:\n--------- \n{attributes}\n--------- "
 
-
     def head(self):
         """
         Returns a printout summary of basic yhat_details values
-
         """
-
-
         df = pd.DataFrame({
             'yhat': self.yhat,
             'y_linear': self.y_linear,
             'fit': self.fit,
             'adj_fit': self.adjusted_fit,
             'agreement': self.agreement
-            
         })
 
         df['yhat_nonlin'] = df['yhat'] - df['y_linear']
@@ -117,113 +90,4 @@ class PredictionResults:
         print(df.head())
         return df
 
-    
-    def generate_top_five(self, metadata:VaultMetadata):
-        """Generates top 5 relevant observations as well as top 5 most important
-        variables given input metadata and a results class containing weights_compound
-
-        Args:
-            metadata (VaultMetadata): Metadata class object containing row and column
-            names so we can label top five rankings
-        """
-
-
-        top_weights = []
-        for col in self.weights_compound:
-            df = pd.Series(col.flatten())
-            rel_weights = df.nlargest(5).index.tolist()
-            top_weights.append(rel_weights)
-
-        self.relevant_weights = [[metadata.Xrow_labels[i] for i in row_indices] for row_indices in top_weights]
-
-        matrices = self.combi_compound
-        top_labels_all_matrices = []
-        for matrix in matrices:
-            df_row = pd.Series(matrix[0])
-            top_indices = df_row.nlargest(5).index.tolist()
-            top_labels = [metadata.Xcol_labels[i] for i in top_indices]
-            top_labels_all_matrices.append(top_labels)
-
-        self.variable_importance = top_labels_all_matrices
-    
-
-    def save_results_to_vault(self, X, y, theta, metadata:VaultMetadata, options:PredictionOptions, db_username:str, db_password:str):
-        """Saves experiment data to the vault_results database along with Metadata
-        needed to display the raw information
-
-        Args:
-            X (np.ndarray, pd.Series or list): X input that was used to generate prediction results
-            y (np.ndarray, pd.Series or list): y input that was used to generate prediction results
-            theta (np.ndarray, pd.Series or list): theta matrix input that was used to generate prediction results
-            metadata (VaultMetadata): Supporting information to make prediction data readable
-            options (PredictionOptions): Optional parameter inputted into the prediction model
-            db_username (str): Username used to access csa database
-            db_password (str): Password used to access csa database
-        """
-
-
-        self.generate_top_five(metadata)
-        
-        # Establish a connection with the database
-        connection = connect(db_username, db_password)
-
-        foreign_keys = vault_upload.post_vault_metadata(connection=connection, X=X, y=y, metadata=metadata)
-
-        
-        resp = vault_upload.post_vault_results(connection = connection, results = self, options=class_obj_to_dict(options),
-                                              foreign_keys = foreign_keys, metadata = class_obj_to_dict(metadata), theta = theta)
-
-
-        print(resp)
-
-        
-    def model_analysis(self, y_actuals, X_cols):
-        """Prints and returns tables of summary statistics of a given set of PredictionResults
-
-        Args:
-            y_actuals (pd.Series): Actual values (to be compared to yhats)
-            X_cols (list): Array of variable (column) names
-
-        Returns:
-            analysis_list : Array of model_analysis tables 
-                (y Actual Mean, Informativeness Weighted Co-occurence, Linear Component Analysis, Variable Importance)
-        """
-
-        if not hasattr(self, 'combi_compound'):
-            raise Exception("Attribute: combi_compound required to model analysis results.\nPlease set is_return_grid=True in your prediction options")
-
-        # Run analysis
-        analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
-                               fits=self.fit, combi_compound=self.combi_compound, X_cols=X_cols)
-        
-        analysis_names = ["y Actual Mean: \n","Informativeness Weighted Co-occurence: \n",
-                          "Linear Component Analysis: \n","Variable Importance: \n"]
-
-        # Printout summary
-        index = 0
-
-        print("--------------\nSUMMARY STATS: \n")
-        for analysis in analysis_list:
-            print(analysis_names[index])
-            print(analysis)
-            index += 1
-            print("\n")
-        print("--------------")
-
-        # Return list of pandas tables containing summary data. *Not required to see stats
-        return analysis_list
-    
-
-    def save_to_excel(self, y_actuals, X_cols, outcome_labels, filepath:str):
-
-        if not hasattr(self, 'combi_compound'):
-            raise Exception("Attribute: combi_compound required to model analysis results.\nPlease set is_return_grid=True in your prediction options")
-
-        # Run analysis
-        analysis_list = summary.model_analysis(yhats=self.yhat, y_actuals=y_actuals, y_linear=self.y_linear,
-                               fits=self.fit, combi_compound=self.combi_compound, X_cols=X_cols)
-        
-        create_excel_sheet.generate_workbook(analysis_list, result_path=filepath,
-                                              PredictionResults=self, X_cols=X_cols,
-                                              test_set_names=outcome_labels,y_actuals=y_actuals)
     
