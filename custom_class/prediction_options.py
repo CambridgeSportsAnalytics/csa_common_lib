@@ -51,7 +51,7 @@ class PredictionOptions:
 
     def init_from_dict(self, inputs):
         """ Accepts a dictionary of inputs and returns a PredictionOptions obj 
-        updated with all passed optional values
+        updated with all passed optional values. Essentially an update method
 
         Args:
             inputs (dict): Intakes a dictionary of inputs deconstructed in the 
