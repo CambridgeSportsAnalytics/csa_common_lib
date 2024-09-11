@@ -2,7 +2,7 @@ import sys
 import os
 import numpy as np
 
-from csa_common_lib.custom_class.vault_metadata import VaultMetadata
+from csanalytics_local.private_classes._vault_metadata import VaultMetadata
 from csa_common_lib.custom_class.prediction_options import PredictionOptions
 
 

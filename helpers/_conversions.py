@@ -1,5 +1,8 @@
 import numpy as np
-import pandas as pd
+import os
+
+if os.getenv('LAMBDA_ENV') == None:
+    import pandas as pd
 
 
 def convert_to_float32(obj):

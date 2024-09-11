@@ -2,8 +2,8 @@ import os
 
 if os.getenv('LAMBDA_ENV') == None:
       from plotnine import *
-
-import pandas as pd
+      import pandas as pd
+      
 import numpy as np
 
 def y_actual_means_graph(data,filepath):

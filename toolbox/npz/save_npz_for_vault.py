@@ -8,7 +8,7 @@ from .npz_io import save_to_npz
 
 # Import necessary csa_common_lib modules
 from csa_common_lib.custom_class.prediction_options import PredictionOptions
-from csa_common_lib.custom_class.vault_metadata import VaultMetadata
+from csanalytics_local.private_classes._vault_metadata import VaultMetadata
 from csa_common_lib.custom_class.prediction_results import PredictionResults
 from csa_common_lib.helpers._vault import validate_vault_npz_data
 from csa_common_lib.toolbox.classes.class_utils import class_obj_to_dict

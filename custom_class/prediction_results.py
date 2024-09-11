@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 class PredictionResults:
     """
@@ -73,21 +72,6 @@ class PredictionResults:
         attributes = "\n".join(f"- {key}" for key in self.raw_data[0].keys())
         return f"\nResults:\n--------- \n{attributes}\n--------- "
 
-    def head(self):
-        """
-        Returns a printout summary of basic yhat_details values
-        """
-        df = pd.DataFrame({
-            'yhat': self.yhat,
-            'y_linear': self.y_linear,
-            'fit': self.fit,
-            'adj_fit': self.adjusted_fit,
-            'agreement': self.agreement
-        })
-
-        df['yhat_nonlin'] = df['yhat'] - df['y_linear']
-
-        print(df.head())
-        return df
+    
 
     
