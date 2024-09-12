@@ -44,9 +44,9 @@ class PredictionOptions:
             print(f"{key}: {value}")
 
     
-    def __repr__(self):
-        class_type = str(type(self)).split(".")[-1].split("'")[0]
-        f"{class_type}\n{self.display()}\n"
+    # def __repr__(self):
+    #     class_type = str(type(self)).split(".")[-1].split("'")[0]
+    #     f"{class_type}\n{self.display()}\n"
 
 
     def init_from_dict(self, inputs):
