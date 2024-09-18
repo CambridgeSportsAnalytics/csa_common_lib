@@ -1,12 +1,24 @@
 import copy
 import numpy as np
 
+
 class PredictionOptions:
-    """
-    Prediction Options Class:
-    Supports a master default list of all possible input options used by predict, maxfit and optvar.
-    Some models overlap in input options but setting a parameter that is not used by a given model will
+    """Supports a master default list of all possible input options 
+    used by predict, maxfit and optvar. Some models overlap in input 
+    options but setting a parameter that is not used by a given model will
     not affect it.
+
+    Returns
+    -------
+    PredictionsOptions
+        Options class to organize and persist parameters used in the
+        the prediction models.
+
+    Raises
+    ------
+    AttributeError
+        When attempting to set or get an attribute that does not 
+        exist in the options dictionary.
     """
 
     def __init__(self, **kwargs):
@@ -14,7 +26,7 @@ class PredictionOptions:
             'threshold': [0],
             'is_threshold_percent': True,
             'most_eval': True,
-            'eval_type': 'relevance',
+            'eval_type': 'all',
             'adj_fit_multiplier': 'K',
             'cov_inv': None,
         }
@@ -44,6 +56,9 @@ class PredictionOptions:
             print(f"{key}: {value}")
 
     
+    # # Commented out because this will show Options' contents for each
+    # # reference call to the options class. This is useful to uncomment
+    # # for deep debugging or as example code.
     # def __repr__(self):
     #     class_type = str(type(self)).split(".")[-1].split("'")[0]
     #     f"{class_type}\n{self.display()}\n"
@@ -99,7 +114,7 @@ class MaxFitOptions(PredictionOptions):
         super().__init__(**kwargs)
         self.options.update({
             'threshold': None,
-            'threshold_range': (0, 1),
+            'threshold_range': np.array((0, 0.20, 0.50, 0.80), dtype='float32'),
             'stepsize': 0.20,
             'objective': 'adjusted_fit',
             'is_return_grid': False,
