@@ -26,7 +26,7 @@ class PredictionOptions:
             'threshold': [0],
             'is_threshold_percent': True,
             'most_eval': True,
-            'eval_type': 'relevance',
+            'eval_type': 'both',
             'adj_fit_multiplier': 'K',
             'cov_inv': None,
         }

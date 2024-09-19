@@ -24,7 +24,8 @@ class PredictionResults:
             'fit', 'rho', 'agreement', 'outlier_influence', 'asymmetry', 'y_linear',
             'yhat_grid', 'weights_grid', 'adjusted_fit_grid', 'max_attributes',
             'combi_grid', 'yhat_compound', 'adjusted_fit_compound', 'combi_compound',
-            'weights_compound', 'fit_compound','variable_importance'
+            'weights_compound', 'fit_compound','variable_importance', 'maxfit_index_grid',
+            'maxfit_index_winner'
         ]
 
         if not self.raw_data:
