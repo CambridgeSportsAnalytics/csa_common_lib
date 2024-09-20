@@ -40,7 +40,8 @@ def variable_importance(combi_compound:list, X_cols:list):
     return variable_importance
 
 
-def t_stats_and_betas(yhats:list, y_actuals:pd.Series, y_linear:list, fits:list, percentile_low:int=20, percentile_high:int=80):
+def t_stats_and_betas(yhats:list, y_actuals:pd.Series, y_linear:list, 
+                      fits:list, percentile_low:int=20, percentile_high:int=80):
     """Returns the beta and t-stats table at subsamples of high, mid, and low fit
 
     Args:
@@ -100,14 +101,13 @@ def t_stats_and_betas(yhats:list, y_actuals:pd.Series, y_linear:list, fits:list,
     
     t_stats_and_betas = pd.DataFrame(results,index=['Beta','T-Statistic'])
     
-    
-    
     return t_stats_and_betas
 
 
-
-def y_actual_means(yhats:list, y_actuals:pd.Series, fits:list, percentile_low:int=20, percentile_high:int=80):
-    """Returns the y_actual_means table, containing y_actual mean at values when yhat is high and low and fit is high and low
+def y_actual_means(yhats:list, y_actuals:pd.Series, fits:list, 
+                   percentile_low:int=20, percentile_high:int=80):
+    """Returns the y_actual_means table, containing y_actual mean 
+    at values when yhat is high and low and fit is high and low.
 
     Args:
         yhats (list):Predictiion values
@@ -117,7 +117,8 @@ def y_actual_means(yhats:list, y_actuals:pd.Series, fits:list, percentile_low:in
         percentile_high (int, optional): Defaults to 80.
 
     Returns:
-        pd.Dataframe : Table containing mean y_actual values at varying level of fit
+        pd.Dataframe : Table containing mean y_actual values at varying 
+        level of fit
     """
 
 
@@ -181,7 +182,8 @@ def y_actual_means(yhats:list, y_actuals:pd.Series, fits:list, percentile_low:in
 
 
 def high_mid_low(data:list, percentile_low:list=0, percentile_high:int=1):
-    """Takes in an data and returns the high, middle, and low cutoffs for the data
+    """Takes in an data and returns the high, middle, and low cutoffs 
+    for the data.
 
     Args:
         data (np.ndarray): data whose percentiles we are trying to access
@@ -189,8 +191,9 @@ def high_mid_low(data:list, percentile_low:list=0, percentile_high:int=1):
         percentile_high (int, optional): Defaults to 1.
 
     Returns:
-        high_indexes, mid_indexes, low_indexes : each is an data of indices that correspond
-        with values in the passed data (first parameter) based on which percentile range it belongs to 
+        high_indexes, mid_indexes, low_indexes : each is an data of 
+        indices that correspond with values in the passed data 
+        (first parameter) based on which percentile range it belongs to 
     """
 
 
@@ -202,8 +205,11 @@ def high_mid_low(data:list, percentile_low:list=0, percentile_high:int=1):
     
     return high_indexes, mid_indexes, low_indexes
 
-def info_weighted_co_occurrence(yhats:list, y_actuals:pd.Series, m1:int=None, o1:int=None, m2:int=None, o2:int=None):
-    """Returns the informativeness weighted co-occurrence of yhat and y_actuals
+
+def info_weighted_co_occurrence(yhats:list, y_actuals:pd.Series, 
+                                m1:int=None, o1:int=None, m2:int=None, o2:int=None):
+    """Returns the informativeness weighted co-occurrence of yhat 
+    and y_actuals
 
     Args:
         yhats (list):Predictiion values
@@ -248,8 +254,10 @@ def info_weighted_co_occurrence(yhats:list, y_actuals:pd.Series, m1:int=None, o1
     return co_occurence
 
 
-def ifwco_table(yhats:list, y_actuals:pd.Series, fits:list, percentile_low:int=20, percentile_high:int=80):
-    """Returns the info weighted co occucurence (ifwco) table of yhat and y_actual at high and low fits and values
+def ifwco_table(yhats:list, y_actuals:pd.Series, fits:list, 
+                percentile_low:int=20, percentile_high:int=80):
+    """Returns the info weighted co occucurence (ifwco) table of yhat 
+    and y_actual at high and low fits and values
 
     Args:
         yhats (list):Predictiion values
@@ -362,7 +370,8 @@ def ifwco_table(yhats:list, y_actuals:pd.Series, fits:list, percentile_low:int=2
 
 
 def linear_component_analysis(yhats:list, y_actuals:pd.Series, y_linear:list):
-    """Returns the coefficients and p-values of the linear and non-linear parts of the model.
+    """Returns the coefficients and p-values of the linear and 
+    non-linear parts of the model.
 
 
     Args:
@@ -423,9 +432,11 @@ def linear_component_analysis(yhats:list, y_actuals:pd.Series, y_linear:list):
     return lin_comp_analyis
 
 
-def model_analysis(yhats, y_actuals, y_linear, fits, combi_compound, X_cols, percentile_low=20, percentile_high=80):
-    """Returns a list with the metrics for average Y when Yhat is low/high and fit is low/high,
-    informativeness-weighted co-occurrence for yhat and y_actuals, and the betas and p-values of the
+def model_analysis(yhats, y_actuals, y_linear, fits, combi_compound, 
+                   X_cols, percentile_low=20, percentile_high=80):
+    """Returns a list with the metrics for average Y when Yhat is 
+    low/high and fit is low/high, informativeness-weighted co-occurrence
+    for yhat and y_actuals, and the betas and p-values of the
     regression of y_actuals on the linear and non-linear components of yhat.
 
     Args:
