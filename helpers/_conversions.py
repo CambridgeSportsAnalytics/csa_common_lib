@@ -5,7 +5,7 @@ if os.getenv('LAMBDA_ENV') == None:
     import pandas as pd
 
 
-def convert_to_float32(obj):
+def convert_to_float32(obj):    
     """
     Recursively converts all numerical values in a dictionary or 
     a list to float32. If `obj` is neither a dictionary nor a list, 
