@@ -15,6 +15,8 @@ def get_table_columns(table_name: str, api_key: str):
         str[]: Returns an array of arrays containing key-value pairs.
             ie. [['key', 'value'], ['key', 'value'], ...]
     """
+    
+    
     url = "https://v9spadcya3.execute-api.us-east-1.amazonaws.com/v1/db-fields"
     headers = {"x-api-key": api_key}
 
