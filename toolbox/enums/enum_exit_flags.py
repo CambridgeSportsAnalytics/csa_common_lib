@@ -25,7 +25,6 @@ class AccessIDStatus(Enum):
         return self.value[0]
     
     
-    
 class UserTokenStatus(Enum):
     """Enumeration of user Token Status flags.
 
