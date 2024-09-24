@@ -7,6 +7,24 @@ class PredictionOptions:
     used by predict, maxfit and optvar. Some models overlap in input 
     options but setting a parameter that is not used by a given model will
     not affect it.
+    
+    threshold : float or ndarray[1-by-T], optional (default=None)
+        Threshold to evaluate relevant observations.
+        If threshold=None, the model will evaluate across thresholds
+        from [0, 0.90) in 0.10 increments.
+    is_threshold_percent : bool, optional (default=True)
+        Specify whether threshold is in percentage (decimal) units.
+    most_eval : bool, optional (default=True)
+        Specify the direction of threshold evluation on the corresponding
+        censor type.
+        True:  [eval_type] score > threshold
+        False: [eval_type] score < threshold
+    eval_type : str, optional (default="both")
+        Specify evaluation censor type, relevance, similarity, or both.
+    adj_fit_multiplier : str, optional (default='K')
+        Adjusted fit multiplier. Specify either 'log', 'K', or '1'.
+    cov_inv : ndarray [K-by-K], optional (default=None)
+        Inverse covariance matrix, specify for speed.
 
     Returns
     -------
@@ -65,15 +83,18 @@ class PredictionOptions:
 
 
     def init_from_dict(self, inputs):
-        """ Accepts a dictionary of inputs and returns a PredictionOptions obj 
-        updated with all passed optional values. Essentially an update method
+        """ Accepts a dictionary of inputs and returns a 
+        PredictionOptions object updated with all passed optional values. 
+        Essentially, this is an update method.
 
         Args:
-            inputs (dict): Intakes a dictionary of inputs deconstructed in the 
-            lambda function
+            inputs (dict): Intakes a dictionary of inputs deconstructed 
+            in an AWS Lambda function.
 
         Returns:
-            PredictionOptions:  PredictionOptions obj that holds all passed optional values. Non-passed options remain default setting
+            PredictionOptions: PredictionOptions obj that 
+            holds all passed optional values. Non-passed options 
+            remain default setting
         """
 
         
@@ -86,15 +107,15 @@ class PredictionOptions:
 
 
     def clone_with(self, **kwargs):
-        """ Returns a clone of the passed PredictionOptions object with user-specified 
-        attribute overwrites (via key value pairs)
+        """ Returns a clone of the passed PredictionOptions object 
+        with user-specified attribute overwrites (via key value pairs)
 
         Args:
-            key/value pair (attr/value): Attributes to overwrite in the cloned obj 
-            lambda function
+            key/value pair (attr/value): Attributes to overwrite in 
+            the cloned object lambda function
 
         Returns:
-            PredictionOptions:  PredictionOptions obj 
+            PredictionOptions: PredictionOptions obj 
         """
 
 
@@ -107,9 +128,49 @@ class PredictionOptions:
 class MaxFitOptions(PredictionOptions):
     """
     MaxFitOptions Class:
-    Inherits from PredictionOptions and adds additional options.
+    Inherits from PredictionOptions and adds additional options specific
+    max fit problems.
+    
+    threshold : not applicable
+        Max fit solves for the optimal threshold that maximizes the 
+        fit (or adjusted fit) value.
+    threshold_range : tuple or ndarray
+        Min/max range for evaluating maxfit threshold, by default (0,1)
+        If an ndarray is passed in, max fit evaluates over the specified
+        threshold values in the ndarray
+    stepsize : float, optional (default=0.20)
+        Stepsize to evaluate range of thresholds to solve for max fit.
+        Decreasing stepsize will increase the granularity of the search.
+    most_eval : bool, optional (default=True)
+        Specify the direction of threshold evluation on the censor score.
+        The censor score is determined by eval_type.
+        True:  censor score > threshold
+        False: censor score < threshold
+    eval_type : str, optional (default="both")
+        Specify censor threshold type, relevance, similarity, or both.
+    cov_inv : ndarray [K-by-K], optional (default=None)
+        Inverse covariance matrix, specify for speed.
+    objective : str, optional (default="adjusted_fit)
+        Objective function to optimize, either fit or adjusted_fit.
+    is_return_grid : bool, optional (default=False)
+        Returns grid of adjusted_fits, yhats, and weights via output_details
+        for all the combinations evaluated. This is only applicable if
+        max fit is being used by grid or grid_singularity operations.
+    
+    Returns
+    -------
+    MaxFitOptions
+        Options class to organize and persist parameters used for the
+        maximum fit prediction model.
+
+    Raises
+    ------
+    AttributeError
+        When attempting to set or get an attribute that does not 
+        exist in the options dictionary.        
     """
     
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.options.update({
@@ -128,6 +189,54 @@ class OptVarOptions(MaxFitOptions):
     """
     OptVarOptions Class:
     Inherits from MaxFitOptions and adds additional options.
+    
+    threshold_range : tuple or ndarray
+        Min/max range for evaluating maxfit threshold, by default (0,1)
+        If an ndarray is passed in, max fit evaluates over the specified
+        threshold values in the ndarray
+    stepsize : float, optional (default=0.20)
+        Stepsize to evaluate range of thresholds to solve for max fit.
+        Decreasing stepsize will increase the granularity of the search.
+        Not applicable if threshold_range is an ndarray.
+    most_eval : bool, optional (default=True)
+        Specify the direction of threshold evluation on the censor score.
+        The censor score is determined by eval_type.
+        True:  censor score > threshold
+        False: censor score < threshold
+    eval_type : str, optional (default="both")
+        Specify censor threshold type, relevance, similarity, or both.
+    cov_inv : ndarray [K-by-K], optional (default=None)
+        Inverse covariance matrix, specify for speed.
+    objective : str, optional (default="adjusted_fit)
+        Objective function to optimize, either fit or adjusted_fit.
+    attribute_combi : ndarray [Q-by-K], optional (default=None)
+        Matrix of binary row vectors to indicate variable choices.
+        Each row is a combination of variables to evaluate.
+        If not specified, function will evaluate all possible combinations.
+    max_iter : int, optional (default=1_000_000)
+        Maximum number of grid cells to evaluate. Since this is a O(n^K)
+        computational time, we suggest balancing computation time
+        and memory with the maximum number of cells to evaluate.
+    k : int, optional (default=1)
+        Lower bound for the number of variables to include, by default 1.
+    is_return_grid : boolean, optional (default=False)
+        Returns grid of adjusted_fits, yhats, and weights via output_details
+        for all the combinations evaluated.
+    is_return_weights_grid : boolean, optional (default=False)
+        Saves and returns the weights grid for all censors, this is the
+        the largest matrix in yhat_details.
+        
+    Returns
+    -------
+    OptVarOptions
+        Options class to organize and persist parameters used for the
+        grid (and grid singularity) prediction model.
+
+    Raises
+    ------
+    AttributeError
+        When attempting to set or get an attribute that does not 
+        exist in the options dictionary.      
     """
     
     def __init__(self, **kwargs):
@@ -136,6 +245,7 @@ class OptVarOptions(MaxFitOptions):
             'attribute_combi': None,
             'max_iter': 1_000_000,
             'k': 1,
+            'is_return_grid': False,
             'is_return_weights_grid': False,
         })
         
