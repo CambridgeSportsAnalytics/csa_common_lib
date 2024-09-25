@@ -152,10 +152,6 @@ class MaxFitOptions(PredictionOptions):
         Inverse covariance matrix, specify for speed.
     objective : str, optional (default="adjusted_fit)
         Objective function to optimize, either fit or adjusted_fit.
-    is_return_grid : bool, optional (default=False)
-        Returns grid of adjusted_fits, yhats, and weights via output_details
-        for all the combinations evaluated. This is only applicable if
-        max fit is being used by grid or grid_singularity operations.
     
     Returns
     -------
@@ -178,7 +174,6 @@ class MaxFitOptions(PredictionOptions):
             'threshold_range': np.array((0, 0.20, 0.50, 0.80), dtype='float32'),
             'stepsize': 0.20,
             'objective': 'adjusted_fit',
-            'is_return_grid': False,
         })
         
         # Update the options dictionary with any provided kwargs
@@ -219,12 +214,10 @@ class OptVarOptions(MaxFitOptions):
         and memory with the maximum number of cells to evaluate.
     k : int, optional (default=1)
         Lower bound for the number of variables to include, by default 1.
-    is_return_grid : boolean, optional (default=False)
-        Returns grid of adjusted_fits, yhats, and weights via output_details
-        for all the combinations evaluated.
-    is_return_weights_grid : boolean, optional (default=False)
+    is_retain_all_grid_objects : boolean, optional (default=False)
         Saves and returns the weights grid for all censors, this is the
-        the largest matrix in yhat_details.
+        the largest matrix in yhat_details. This is typically set to True
+        for audit or deep research and development purposes.
         
     Returns
     -------
@@ -245,8 +238,7 @@ class OptVarOptions(MaxFitOptions):
             'attribute_combi': None,
             'max_iter': 1_000_000,
             'k': 1,
-            'is_return_grid': False,
-            'is_return_weights_grid': False,
+            'is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
         })
         
         # Update the options dictionary with any provided kwargs
