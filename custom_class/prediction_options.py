@@ -180,9 +180,9 @@ class MaxFitOptions(PredictionOptions):
         self.options.update(kwargs)
 
 
-class OptVarOptions(MaxFitOptions):
+class GridOptions(MaxFitOptions):
     """
-    OptVarOptions Class:
+    GridOptions Class:
     Inherits from MaxFitOptions and adds additional options.
     
     threshold_range : tuple or ndarray
@@ -214,14 +214,14 @@ class OptVarOptions(MaxFitOptions):
         and memory with the maximum number of cells to evaluate.
     k : int, optional (default=1)
         Lower bound for the number of variables to include, by default 1.
-    is_retain_all_grid_objects : boolean, optional (default=False)
+    _is_retain_all_grid_objects : boolean, optional (default=False)
         Saves and returns the weights grid for all censors, this is the
         the largest matrix in yhat_details. This is typically set to True
         for audit or deep research and development purposes.
         
     Returns
     -------
-    OptVarOptions
+    GridOptions
         Options class to organize and persist parameters used for the
         grid (and grid singularity) prediction model.
 
@@ -238,7 +238,7 @@ class OptVarOptions(MaxFitOptions):
             'attribute_combi': None,
             'max_iter': 1_000_000,
             'k': 1,
-            'is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
+            '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
         })
         
         # Update the options dictionary with any provided kwargs
