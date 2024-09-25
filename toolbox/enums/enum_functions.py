@@ -11,14 +11,15 @@ class PSRFunction(Enum):
     """    
     PREDICT = (0, 'predict')
     MAXFIT = (1, 'maxfit')
-    CKT = (2, 'ckt')
-    RELEVANCE = (3, 'relevance')
-    SIMILARITY = (4, 'similarity')
-    INFORMATIVENESS = (5, 'informativeness')
-    FIT = (6, 'fit')
-    ADJUSTED_FIT = (7, 'adjusted_fit')
-    ASYMMETRY = (8, 'asymmetry')
-    CO_OCCURENCE = (9, 'co-occurence')
+    GRID = (2, 'grid')
+    GRID_SINGULARITY = (3, 'grid_singularity')
+    RELEVANCE = (4, 'relevance')
+    SIMILARITY = (5, 'similarity')
+    INFORMATIVENESS = (6, 'informativeness')
+    FIT = (7, 'fit')
+    ADJUSTED_FIT = (8, 'adjusted_fit')
+    ASYMMETRY = (9, 'asymmetry')
+    CO_OCCURENCE = (10, 'co-occurence')
     
     
     def __str__(self):
