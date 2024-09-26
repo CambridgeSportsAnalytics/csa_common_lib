@@ -130,6 +130,7 @@ def hide_cursor():
     sys.stdout.write("\033[?25l")  # Hide cursor
     sys.stdout.flush()
 
+
 def show_cursor():
     """Shows the cursor in terminal.
     """    
@@ -140,17 +141,22 @@ def show_cursor():
 def is_notifier_enabled():
     return os.environ.get('CSA_CONSOLE_NOTIFIER').lower() == 'true'
 
+
 def get_notifier_status():
     return os.environ.get('CSA_CONSOLE_NOTIFIER', 'False').lower() == 'true'
+    
     
 def set_notifier_status(is_enable:bool=True):
     os.environ['CSA_CONSOLE_NOTIFIER'] = 'True' if is_enable else 'False'
 
+
 def enable_notifier():
     set_notifier_status(True)
     
+    
 def disable_notifier():
     set_notifier_status(False)
+    
     
 if __name__ == "__main__":
     
