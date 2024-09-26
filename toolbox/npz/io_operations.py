@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 # Local application imports
-from csa_common_lib.helpers._conversions import convert_to_float32
+from csa_common_lib._helpers._conversions import convert_to_float32
 from csa_common_lib.toolbox.classes.utilities import (
     class_obj_to_dict,
     is_obj_userdefined_class
