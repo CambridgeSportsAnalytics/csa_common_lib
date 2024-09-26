@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 from csanalytics_local.private_classes._vault_metadata import VaultMetadata
-from csa_common_lib.custom_class.prediction_options import PredictionOptions
+from csa_common_lib.classes.prediction_options import PredictionOptions
 
 
 def validate_vault_npz_data(y, X, theta, yhat_details, Metadata:VaultMetadata, Options:PredictionOptions) -> bool:

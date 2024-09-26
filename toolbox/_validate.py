@@ -6,7 +6,7 @@ import warnings
 
 import numpy as np
 
-from csa_common_lib.toolbox.enums.enum_functions import PSRFunction
+from csa_common_lib.enum_types.functions import PSRFunction
 
 
 def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
