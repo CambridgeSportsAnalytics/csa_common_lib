@@ -1,469 +1,517 @@
+"""
+This module provides functions and utilities for performing statistical
+analyses and generating summary tables.
+"""
+
 import numpy as np
 import pandas as pd
 
+from .insights import co_occurrence
 
-def variable_importance(combi_compound:list, X_cols:list):
-    """Returns the variable importance table.
 
-    Args:
-        combi_compound (list): Weighted matrix
-        X_cols (list): Array of variable (column) names
-
-    Returns:
-        pd.Dataframe : Table containing variable importance statistics
+def variable_importance_by_weights(combi_compound, X_cols):
     """
-     
-    #turn grid into an array
+    Calculate a table for variable importance as a function of the grid
+    cell weights. This is NOT relevance-based importance.
+
+    Parameters
+    ----------
+    combi_compound : list
+        List of arrays representing the weighted matrix.
+    X_cols : list
+        List of variable (column) names.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing variable importance statistics, including 
+        median, standard deviation, and percentiles (5th, 20th, 50th, 80th, 95th).
+    """
+    
+    
+    # Convert the list of arrays into a 2D NumPy array
     combi_compound = np.vstack(combi_compound)
     
-    #get medians, standard deviations, and percentiles of each column    
-    medians = np.median(combi_compound,axis=0)
-    std_devs = np.std(combi_compound,axis=0)
-    percentile_05 = np.percentile(combi_compound,5,axis=0)
-    percentile_20 = np.percentile(combi_compound,20,axis=0)
-    percentile_50 = np.percentile(combi_compound,50,axis=0)
-    percentile_80 = np.percentile(combi_compound,80,axis=0)
-    percentile_95 = np.percentile(combi_compound,95,axis=0)
+    # Calculate medians, standard deviations, and percentiles for each column
+    medians = np.median(combi_compound, axis=0)
+    std_devs = np.std(combi_compound, axis=0)
+    percentiles = {
+        '5th Percentile': np.percentile(combi_compound, 5, axis=0),
+        '20th Percentile': np.percentile(combi_compound, 20, axis=0),
+        '50th Percentile': np.percentile(combi_compound, 50, axis=0),
+        '80th Percentile': np.percentile(combi_compound, 80, axis=0),
+        '95th Percentile': np.percentile(combi_compound, 95, axis=0),
+    }
     
-    #set up dataframe of results sorted by highest medians
+    # Create a DataFrame of results sorted by the highest medians
     result = {
-            'Median': medians,
-            'Std Dev': std_devs,
-            '5th Percentile': percentile_05,
-            '20th Percentile': percentile_20,
-            '50th Percentile': percentile_50,
-            '80th Percentile': percentile_80,
-            '95th Percentile': percentile_95
-            }
-    variable_importance = pd.DataFrame(result,index=X_cols).sort_values(by='Median',ascending=False)
-
-    return variable_importance
-
-
-def t_stats_and_betas(yhats:list, y_actuals:pd.Series, y_linear:list, 
-                      fits:list, percentile_low:int=20, percentile_high:int=80):
-    """Returns the beta and t-stats table at subsamples of high, mid, and low fit
-
-    Args:
-        yhats (list): Predictiion values
-        y_actuals (pd.Series): Actual values (to be compared to yhats)
-        y_linear (list): Prediction value using standard linear regression
-        fits (list): Prediction fits
-        percentile_low (int, optional): Defaults to 20.
-        percentile_high (int, optional): Defaults to 80.
-
-    Returns:
-        pd.Dataframe : Table containing t_stats and betas for various levels of fits
-    """
-
+        'Median': medians,
+        'Std Dev': std_devs
+    }
+    result.update(percentiles)
     
-    #make inputs arrays
+    return pd.DataFrame(result, index=X_cols).sort_values(by='Median', ascending=False)
+
+
+def tstats_and_betas(yhats, y_actuals, y_linear, fits, 
+                      percentile_low=20, percentile_high=80):
+    """
+    Calculate and return a table of beta coefficients and t-statistics 
+    for subsamples of high, mid, and low fit.
+
+    Parameters
+    ----------
+    yhats : list
+        Prediction values.
+    y_actuals : pd.Series
+        Actual values to be compared to `yhats`.
+    y_linear : list
+        Prediction values using standard linear regression.
+    fits : list
+        Prediction fit scores.
+    percentile_low : int, optional
+        The lower percentile cutoff for subsampling, by default 20.
+    percentile_high : int, optional
+        The upper percentile cutoff for subsampling, by default 80.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing beta coefficients and t-statistics for linear 
+        and excess RBP components at various levels of fit.
+    """
+    
+    
+    # Convert inputs to arrays
     yhats = np.array(yhats)
     y_actuals = np.array(y_actuals)
     y_linear = np.array(y_linear)
     fits = np.array(fits)
     
-    #get high, mid, and low fits
-    high_fits, mid_fits, low_fits = high_mid_low(fits,percentile_low,percentile_high)
+    # Get high, mid, and low fits based on percentiles
+    high_fits, mid_fits, low_fits = split_data_by_percentile(fits, percentile_low, percentile_high)
     
-    #block 1: full sample
-    full_sample = linear_component_analysis(yhats,y_actuals,y_linear)
+    # Block 1: Full sample analysis
+    full_sample = linear_component_analysis(yhats, y_actuals, y_linear)
     
-    #block 2: high fit
-    high_fit_yhats = yhats[high_fits]
-    high_fit_y_linear = y_linear[high_fits]
-    high_fit_y_actual = y_actuals[high_fits]
-    high_fit = linear_component_analysis(high_fit_yhats,high_fit_y_actual,high_fit_y_linear)
+    # Block 2: High fit sample analysis
+    high_fit = linear_component_analysis(
+        yhats[high_fits], 
+        y_actuals[high_fits], 
+        y_linear[high_fits]
+    )
     
-    #block 3: mid fit
-    mid_fit_yhats = yhats[mid_fits]
-    mid_fit_y_linear = y_linear[mid_fits]
-    mid_fit_y_actual = y_actuals[mid_fits]
-    mid_fit = linear_component_analysis(mid_fit_yhats,mid_fit_y_actual,mid_fit_y_linear)
+    # Block 3: Mid fit sample analysis
+    mid_fit = linear_component_analysis(
+        yhats[mid_fits], 
+        y_actuals[mid_fits], 
+        y_linear[mid_fits]
+    )
     
-    #block 4: low fit
-    low_fit_yhats = yhats[low_fits]
-    low_fit_y_linear = y_linear[low_fits]
-    low_fit_y_actual = y_actuals[low_fits]
-    low_fit = linear_component_analysis(low_fit_yhats,low_fit_y_actual,low_fit_y_linear)
+    # Block 4: Low fit sample analysis
+    low_fit = linear_component_analysis(
+        yhats[low_fits], 
+        y_actuals[low_fits], 
+        y_linear[low_fits]
+    )
     
-    #set up results
+    # Compile results into a DataFrame
     results = {
-               'Full Sample Linear Component' : [full_sample['beta_linear'],full_sample['t_linear']],
-               'Full Sample Excess RBP Component' : [full_sample['beta_non_linear'],full_sample['t_non_linear']],
-               'High Fit Sample Linear Component' : [high_fit['beta_non_linear'],high_fit['t_non_linear']],
-               'High Fit Sample Excess RBP Component' : [high_fit['beta_non_linear'],high_fit['t_non_linear']],
-               'Mid Fit Sample Linear Component' : [mid_fit['beta_linear'],mid_fit['t_linear']],
-               'Mid Fit Sample Excess RBP Component' : [mid_fit['beta_non_linear'],mid_fit['t_non_linear']],
-               'Low Fit Sample Linear Component' : [low_fit['beta_linear'],low_fit['t_linear']],
-               'Low Fit Sample Excess RBP Component' : [low_fit['beta_non_linear'],low_fit['t_non_linear']]
-                }
+        'Full Sample Linear Component': [full_sample['beta_linear'], full_sample['t_linear']],
+        'Full Sample Excess RBP Component': [full_sample['beta_non_linear'], full_sample['t_non_linear']],
+        'High Fit Sample Linear Component': [high_fit['beta_linear'], high_fit['t_linear']],
+        'High Fit Sample Excess RBP Component': [high_fit['beta_non_linear'], high_fit['t_non_linear']],
+        'Mid Fit Sample Linear Component': [mid_fit['beta_linear'], mid_fit['t_linear']],
+        'Mid Fit Sample Excess RBP Component': [mid_fit['beta_non_linear'], mid_fit['t_non_linear']],
+        'Low Fit Sample Linear Component': [low_fit['beta_linear'], low_fit['t_linear']],
+        'Low Fit Sample Excess RBP Component': [low_fit['beta_non_linear'], low_fit['t_non_linear']]
+    }
     
-    t_stats_and_betas = pd.DataFrame(results,index=['Beta','T-Statistic'])
-    
-    return t_stats_and_betas
+    return pd.DataFrame(results, index=['Beta', 'T-Statistic'])
 
 
-def y_actual_means(yhats:list, y_actuals:pd.Series, fits:list, 
+def y_actual_means(yhats, y_actuals, fits, 
                    percentile_low:int=20, percentile_high:int=80):
-    """Returns the y_actual_means table, containing y_actual mean 
-    at values when yhat is high and low and fit is high and low.
-
-    Args:
-        yhats (list):Predictiion values
-        y_actuals (pd.Series): Actual values (to be compared to yhats)
-        fits (list): Prediction fits
-        percentile_low (int, optional): Defaults to 20.
-        percentile_high (int, optional): Defaults to 80.
-
-    Returns:
-        pd.Dataframe : Table containing mean y_actual values at varying 
-        level of fit
     """
+    Calculate the mean of actual values (`y_actuals`) at high and low 
+    prediction (`yhats`) and fit (`fits`) levels.
 
+    Parameters
+    ----------
+    yhats : list
+        Prediction values.
+    y_actuals : pd.Series
+        Actual values to be compared to `yhats`.
+    fits : list
+        Prediction fit scores.
+    percentile_low : int, optional
+        The lower percentile cutoff for subsampling, by default 20.
+    percentile_high : int, optional
+        The upper percentile cutoff for subsampling, by default 80.
 
-    #make inputs arrays
+    Returns
+    -------
+    pd.DataFrame
+        Table containing mean `y_actual` values at varying levels of 
+        prediction and fit.
+    """
+    
+    
+    # Convert inputs to arrays
     yhats = np.array(yhats)
     y_actuals = np.array(y_actuals)
     fits = np.array(fits)
     
-    #set up high and low yhats for block 2 and 3
-    high_yhats, _, low_yhats = high_mid_low(yhats,percentile_low, percentile_high)
+    # Get high and low yhat indices based on percentiles
+    high_yhats, _, low_yhats = split_data_by_percentile(yhats, percentile_low, percentile_high)
     
-    #block 1: full sample
+    # Block 1: Full sample mean
     full_sample = np.mean(y_actuals)
     
-    #block 2: high yhat sample
-        #high yhat yactual mean
+    # Block 2: High yhat sample analysis
     y_actuals_high_yhat = y_actuals[high_yhats]
     fits_high_yhat = fits[high_yhats]
     high_pred = np.mean(y_actuals_high_yhat)
     
-        #get high and low fits of high yhats
-    high_fits, _, low_fits = high_mid_low(fits_high_yhat,percentile_low, percentile_high)
+    # Get high and low fits for high yhat
+    high_fits, _, low_fits = split_data_by_percentile(fits_high_yhat, percentile_low, percentile_high)
+    high_pred_w_high_fit = np.mean(y_actuals_high_yhat[high_fits])
+    high_pred_w_low_fit = np.mean(y_actuals_high_yhat[low_fits])
     
-        #mean of y_actual at high yhat and high fit
-    y_actuals_high_yhat_high_fit = y_actuals_high_yhat[high_fits]
-    high_pred_w_high_fit = np.mean(y_actuals_high_yhat_high_fit)
-    
-        #mean of y_actual at high yhat and low fit
-    y_actuals_high_yhat_low_fit = y_actuals_high_yhat[low_fits]
-    high_pred_w_low_fit = np.mean(y_actuals_high_yhat_low_fit)
-    
-    #block 3: low yhat sample
+    # Block 3: Low yhat sample analysis
     y_actuals_low_yhat = y_actuals[low_yhats]
     fits_low_yhat = fits[low_yhats]
     low_pred = np.mean(y_actuals_low_yhat)
     
-        #get high and low fits of low yhats
-    high_fits, _, low_fits = high_mid_low(fits_low_yhat,percentile_low,percentile_high)
+    # Get high and low fits for low yhat
+    high_fits, _, low_fits = split_data_by_percentile(fits_low_yhat, percentile_low, percentile_high)
+    low_pred_w_high_fit = np.mean(y_actuals_low_yhat[high_fits])
+    low_pred_w_low_fit = np.mean(y_actuals_low_yhat[low_fits])
     
-        #mean of y_actual at low yhat and high fit
-    y_actuals_low_yhat_high_fit = y_actuals_low_yhat[high_fits]
-    low_pred_w_high_fit = np.mean(y_actuals_low_yhat_high_fit)
-    
-        #mean of y_actual at low yhat and low fit
-    y_actuals_low_yhat_low_fit = y_actuals_low_yhat[low_fits]
-    low_pred_w_low_fit = np.mean(y_actuals_low_yhat_low_fit)
-    
-    #set up result data table
+    # Create the result DataFrame
     results = {
-                'Full Sample' : full_sample,
-                'High Prediction' : high_pred,
-                'High Prediction w/ High Fit' : high_pred_w_high_fit,
-                'High Prediction w/ Low Fit' : high_pred_w_low_fit,
-                'Low Prediction' : low_pred,
-                'Low Prediction w/ High Fit' : low_pred_w_high_fit,
-                'Low Prediction w/ Low Fit' : low_pred_w_low_fit
-                }
-    y_actual_means = pd.DataFrame(results,index=['Y Actual Mean']).T
+        'Full Sample': full_sample,
+        'High Prediction': high_pred,
+        'High Prediction w/ High Fit': high_pred_w_high_fit,
+        'High Prediction w/ Low Fit': high_pred_w_low_fit,
+        'Low Prediction': low_pred,
+        'Low Prediction w/ High Fit': low_pred_w_high_fit,
+        'Low Prediction w/ Low Fit': low_pred_w_low_fit
+    }
     
-    return y_actual_means
+    return pd.DataFrame(results, index=['Y Actual Mean']).T
 
 
-def high_mid_low(data:list, percentile_low:list=0, percentile_high:int=1):
-    """Takes in an data and returns the high, middle, and low cutoffs 
-    for the data.
-
-    Args:
-        data (np.ndarray): data whose percentiles we are trying to access
-        percentile_low (int, optional): Defaults to 0.
-        percentile_high (int, optional): Defaults to 1.
-
-    Returns:
-        high_indexes, mid_indexes, low_indexes : each is an data of 
-        indices that correspond with values in the passed data 
-        (first parameter) based on which percentile range it belongs to 
+def split_data_by_percentile(data, percentile_low:int=20, 
+                             percentile_high:int=80):
     """
+    Determine the indices for high, mid, and low ranges based 
+    on the specified percentiles cutoffs.
 
+    Parameters
+    ----------
+    data : np.ndarray
+        The data for which the percentile cutoffs are calculated.
+    percentile_low : int, optional
+        The lower percentile cutoff for low data, by default 20.
+    percentile_high : int, optional
+        The upper percentile cutoff for high data, by default 80.
 
+    Returns
+    -------
+    tuple of np.ndarray
+        - high_indexes : np.ndarray
+            Indices of data values that fall in the high percentile range.
+        - mid_indexes : np.ndarray
+            Indices of data values that fall in the mid percentile range.
+        - low_indexes : np.ndarray
+            Indices of data values that fall in the low percentile range.
+    """
+    
+    
+    data = np.array(data)  # Ensure the input is a numpy array
     high_value = np.percentile(data, percentile_high)
-    high_indexes = np.where(np.array(data) >= high_value)[0]
     low_value = np.percentile(data, percentile_low)
-    low_indexes = np.where(np.array(data) <= low_value)[0]
-    mid_indexes = np.where((np.array(data) > low_value) & (np.array(data) < high_value))[0]
+    
+    high_indexes = np.where(data >= high_value)[0]
+    low_indexes = np.where(data <= low_value)[0]
+    mid_indexes = np.where((data > low_value) & (data < high_value))[0]
     
     return high_indexes, mid_indexes, low_indexes
 
 
-def info_weighted_co_occurrence(yhats:list, y_actuals:pd.Series, 
-                                m1:int=None, o1:int=None, m2:int=None, o2:int=None):
-    """Returns the informativeness weighted co-occurrence of yhat 
-    and y_actuals
-
-    Args:
-        yhats (list):Predictiion values
-        y_actuals (pd.Series): Actual values (to be compared to yhats)
-        m1 (int, optional): Mean of yhats. Defaults to None.
-        o1 (int, optional): Std. Dev. of yhats. Defaults to None.
-        m2 (int, optional): Mean of y_actuals. Defaults to None.
-        o2 (int, optional): Std. Dev. of y_actuals. Defaults to None.
-
-    Returns:
-        co_occurence : Co-Occurence (int)
+def co_occurrence_summary(yhat:list, y_actual: pd.Series, fits:list, 
+                         percentile_low:int = 20, percentile_high:int = 80) -> pd.DataFrame:
     """
+    Generates a summary table of Informativeness-weighted Co-occurrence (IWCO)
+    values for yhat and y_actual at different levels of fit and prediction.
 
-    if m1 is None:
-        m1 = np.mean(yhats)
-    if o1 is None:
-        o1 = np.std(yhats)  # Assuming standard deviation as a default
-    if m2 is None:
-        m2 = np.mean(y_actuals)
-    if o2 is None:
-        o2 = np.std(y_actuals)  # Assuming standard deviation as a default
-    
-    #using mean and standard deviation, get an array of z scores for both yhat and y_actuals
-    z_yhat = (yhats - m1) / o1
-    z_y_actual = (y_actuals - m2) / o2
-    
-    #calculate the informativeness of the yhat/y_actual pair
-    info_yhat_y_actual = 0.5 * (z_yhat**2 + z_y_actual**2)
-    
-    #calculate the co-occurrence of the yhat/y_actual pair
-    co_occurrence_yhat_y_actual = (z_yhat * z_y_actual) / info_yhat_y_actual
-    
-    #gets the relative weights of each observation based on informativeness
-    w_info = info_yhat_y_actual / sum(info_yhat_y_actual)
-    
-    #calculates weighed co-occurrence by multiplying co-occurrence and informativenss weights
-    w_co_occurrence = co_occurrence_yhat_y_actual * w_info
-    
-    #sum of weighted co-occurrence to get correlation coefficient
-    co_occurence = sum(w_co_occurrence)
-    
-    return co_occurence
+    Parameters
+    ----------
+    yhat : list
+        Predicted values.
+    y_actual : pd.Series
+        Actual values to be compared against the predicted values.
+    fits : list
+        Prediction fits.
+    percentile_low : int, optional
+        Lower percentile cutoff for categorizing high, mid, and low groups. 
+        Default is 20.
+    percentile_high : int, optional
+        Upper percentile cutoff for categorizing high, mid, and low groups. 
+        Default is 80.
 
-
-def ifwco_table(yhats:list, y_actuals:pd.Series, fits:list, 
-                percentile_low:int=20, percentile_high:int=80):
-    """Returns the info weighted co occucurence (ifwco) table of yhat 
-    and y_actual at high and low fits and values
-
-    Args:
-        yhats (list):Predictiion values
-        y_actuals (pd.Series): Actual values (to be compared to yhats)
-        fits (list): Prediction fits
-        percentile_low (int, optional): Defaults to 20.
-        percentile_high (int, optional): Defaults to 80.
-
-    Returns:
-        ifwco_table: pd.Dataframe containing ifwco values of yhat and y_actual
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing IFWCO values for yhat and y_actual at 
+        various levels of fit and predictions.
     """
-
-
-    #make inputs arrays
-    yhats = np.array(yhats)
-    y_actuals = np.array(y_actuals)
+    
+    # Convert inputs to numpy arrays
+    yhat = np.array(yhat)
+    y_actual = np.array(y_actual)
     fits = np.array(fits)
-    
-    #set up high and low fits and yhats for blocks 1, 2, and 3
-    high_yhats, _, low_yhats = high_mid_low(yhats,percentile_low,percentile_high)
-    high_fits, _, low_fits = high_mid_low(fits, percentile_low, percentile_high)
-    
-    #block 1: full sample, high fit, and low fit
-        #calculate means and standard deviations of yhats and y_actuals
-    m1 = np.mean(yhats)
-    o1 = np.std(yhats)
-    m2 = np.mean(y_actuals)
-    o2 = np.std(y_actuals)
-    
-        #iwco of full sample
-    full_sample = info_weighted_co_occurrence(yhats, y_actuals, m1, o1, m2, o2)
-    
-        #iwco of high fit sample
-    high_fits_yhats = yhats[high_fits]
-    high_fits_y_actuals = y_actuals[high_fits]
-    high_fit = info_weighted_co_occurrence(high_fits_yhats, high_fits_y_actuals, m1, o2, m2, o2)
-    
-        #iwco of low fit sample
-    low_fits_yhats = yhats[low_fits]
-    low_fits_y_actuals = y_actuals[low_fits]
-    low_fit = info_weighted_co_occurrence(low_fits_yhats, low_fits_y_actuals, m1, o1, m2, o2)
-    
-    #block 2: high yhat sample
-        #get high and low fits
-    high_yhat_fits = fits[high_yhats]
-    high_yhat_high_fits, _, high_yhat_low_fits = high_mid_low(high_yhat_fits,percentile_low,percentile_high)    
-    
-        #calculate means and standard deviations of yhats and y_actuals when yhat is high
-    high_yhat = yhats[high_yhats]
-    high_yhat_y_actual = y_actuals[high_yhats]
-    m1 = np.mean(high_yhat)
-    o1 = np.std(high_yhat)
-    m2 = np.mean(high_yhat_y_actual)
-    o2 = np.std(high_yhat_y_actual)
-    
-        #iwco of full high yhat sample
-    high_pred = info_weighted_co_occurrence(high_yhat,high_yhat_y_actual, m1, o1, m2, o2)
-    
-        #iwco of high yhat high fit
-    high_yhat_high_fit = high_yhat[high_yhat_high_fits]
-    high_yhat_high_fit_y_actual = high_yhat_y_actual[high_yhat_high_fits]
-    high_pred_w_high_fit = info_weighted_co_occurrence(high_yhat_high_fit, high_yhat_high_fit_y_actual, m1, o1, m2, o2)
-    
-        #iwco of high yhat low fit
-    high_yhat_low_fit = high_yhat[high_yhat_low_fits]
-    high_yhat_low_fit_y_actuals = high_yhat_y_actual[high_yhat_low_fits]
-    high_pred_w_low_fit = info_weighted_co_occurrence(high_yhat_low_fit, high_yhat_low_fit_y_actuals, m1, o1, m2, o2)
-    
-    #block 3: low yhat sample
-        #get high and low fits
-    low_yhat_fits = fits[low_yhats]
-    low_yhat_high_fits, _, low_yhat_low_fits = high_mid_low(low_yhat_fits,percentile_low,percentile_high)    
-    
-        #calculate means and standard deviations of yhats and y_actuals when yhat is high
-    low_yhat = yhats[low_yhats]
-    low_yhat_y_actual = y_actuals[low_yhats]
-    m1 = np.mean(low_yhat)
-    o1 = np.std(low_yhat)
-    m2 = np.mean(low_yhat_y_actual)
-    o2 = np.std(low_yhat_y_actual)
-    
-        #iwco of full high yhat sample
-    low_pred = info_weighted_co_occurrence(low_yhat,low_yhat_y_actual, m1, o1, m2, o2)
-    
-        #iwco of high yhat high fit
-    low_yhat_high_fit = low_yhat[low_yhat_high_fits]
-    low_yhat_high_fit_y_actual = low_yhat_y_actual[low_yhat_high_fits]
-    low_pred_w_high_fit = info_weighted_co_occurrence(low_yhat_high_fit, low_yhat_high_fit_y_actual, m1, o1, m2, o2)
-    
-        #iwco of high yhat low fit
-    low_yhat_low_fit = low_yhat[low_yhat_low_fits]
-    low_yhat_low_fit_y_actuals = low_yhat_y_actual[low_yhat_low_fits]
-    low_pred_w_low_fit = info_weighted_co_occurrence(low_yhat_low_fit, low_yhat_low_fit_y_actuals, m1, o1, m2, o2)
-    
-    #set up results table
+
+    # Split data by percentiles
+    high_yhat_indices, _, low_yhat_indices = \
+        split_data_by_percentile(yhat, percentile_low, percentile_high)
+        
+    high_fit_indices, _, low_fit_indices = \
+        split_data_by_percentile(fits, percentile_low, percentile_high)
+
+    # Calculate means and standard deviations for the full sample
+    mean_yhat, std_yhat = np.mean(yhat), np.std(yhat)
+    mean_y_actual, std_y_actual = np.mean(y_actual), np.std(y_actual)
+
+    # Full sample IWCO
+    iwco_fullsample = co_occurrence(yhat, y_actual, mean_yhat, std_yhat, 
+                                      mean_y_actual, std_y_actual)
+
+    # High fit IWCO
+    iwco_highfit = co_occurrence(
+        yhat[high_fit_indices], y_actual[high_fit_indices], 
+        mean_yhat, std_y_actual, mean_y_actual, std_y_actual
+    )
+
+    # Low fit IWCO
+    iwco_lowfit = co_occurrence(
+        yhat[low_fit_indices], y_actual[low_fit_indices], 
+        mean_yhat, std_yhat, mean_y_actual, std_y_actual
+    )
+
+    # High prediction IFWCO calculations
+    high_predictions, high_predictions_high_fit, high_predictions_low_fit = \
+        _calculate_cooccurrence_by_prediction_group(yhat, y_actual, fits, 
+                                                    high_yhat_indices, 
+                                                    percentile_low, percentile_high)
+
+    # Low prediction IFWCO calculations
+    low_predictions, low_predictions_high_fit, low_predictions_low_fit = \
+        _calculate_cooccurrence_by_prediction_group(yhat, y_actual, fits, 
+                                                    low_yhat_indices, 
+                                                    percentile_low, percentile_high)
+
+    # Set up results table
     results = {
-               'Full Sample' : full_sample,
-               'High Fit' : high_fit,
-               'Low Fit' : low_fit,
-               'High Prediction' : high_pred,
-               'High Prediction w/ High Fit' : high_pred_w_high_fit,
-               'High Prediction w/ Low Fit' : high_pred_w_low_fit,
-               'Low Prediction' : low_pred,
-               'Low Prediction w/ High Fit' : low_pred_w_high_fit,
-               'Low Prediction w/ Low Fit' : low_pred_w_low_fit
-                }
-    ifwco_table = pd.DataFrame(results,index=['Informativeness Weighted Co-Occurrence']).T
+        'Full Sample': iwco_fullsample,
+        'High Fit': iwco_highfit,
+        'Low Fit': iwco_lowfit,
+        'High Prediction': high_predictions,
+        'High Prediction w/ High Fit': high_predictions_high_fit,
+        'High Prediction w/ Low Fit': high_predictions_low_fit,
+        'Low Prediction': low_predictions,
+        'Low Prediction w/ High Fit': low_predictions_high_fit,
+        'Low Prediction w/ Low Fit': low_predictions_low_fit
+    }
+
+    return pd.DataFrame(results, index=['Informativeness-weighted Co-Occurrence']).T
+
+
+def _calculate_cooccurrence_by_prediction_group(yhat:np.ndarray,
+        y_actual:np.ndarray, fits:np.ndarray, group_indices:np.ndarray, 
+        percentile_low:int=20, percentile_high:int=80) -> tuple:
+    """
+    Calculates the informativeness-weighted co-occurrence (IWCO) values
+    by high and low prediction value groups and by high and low fit 
+    subgroups.
+
+    Parameters
+    ----------
+    yhat : ndarray [N-by-1]
+        Array of predicted values.
+    y_actual : ndarray [N-by-1]
+        Array of actual values to be compared against the predicted values.
+    fits : ndarray [N-by-1]
+        Array of prediction fits.
+    group_indices : ndarray [N-by-1]
+        Indices representing the specific group (e.g., high or low yhat) 
+        to be analyzed.
+    percentile_low : int
+        Lower percentile cutoff for categorizing high and low fit subgroups.
+    percentile_high : int
+        Upper percentile cutoff for categorizing high and low fit subgroups.
+
+    Returns
+    -------
+    tuple
+        Tuple containing IWCO values for:
+        - IWCO, full sample
+        - IWCO, high fit subgroup
+        - IWCO, low fit subgroup
+    """
+
+    # Filter yhat, y_actual, and fits based on group indices
+    group_yhat = yhat[group_indices]
+    group_y_actual = y_actual[group_indices]
+    group_fits = fits[group_indices]
     
-    return ifwco_table
+    # Calculate mean and standard deviation for the group
+    mean_yhat = np.mean(group_yhat)
+    std_yhat = np.std(group_yhat)
+    mean_y_actual = np.mean(group_y_actual)
+    std_y_actual = np.std(group_y_actual)
+
+    # Calculate IFWCO for the full group
+    iwco_fullsample = co_occurrence(group_yhat, group_y_actual, 
+                                     mean_yhat, std_yhat, 
+                                     mean_y_actual, std_y_actual)
+
+    # Further split group into high fit and low fit subgroups
+    high_fit_indices, _, low_fit_indices = split_data_by_percentile(
+        group_fits, percentile_low, percentile_high)
+    
+    # Calculate IFWCO for high fit subgroup
+    iwco_highfit = co_occurrence(
+        group_yhat[high_fit_indices], 
+        group_y_actual[high_fit_indices], 
+        mean_yhat, std_yhat, mean_y_actual, std_y_actual
+    )
+
+    # Calculate IFWCO for low fit subgroup
+    iwco_lowfit = co_occurrence(group_yhat[low_fit_indices], 
+                                  group_y_actual[low_fit_indices], 
+                                  mean_yhat, std_yhat, 
+                                  mean_y_actual, std_y_actual
+    )
+
+    return iwco_fullsample, iwco_highfit, iwco_lowfit
 
 
-def linear_component_analysis(yhats:list, y_actuals:pd.Series, y_linear:list):
-    """Returns the coefficients and p-values of the linear and 
-    non-linear parts of the model.
+def linear_component_analysis(yhats: list, y_actuals: pd.Series, y_linear: list) -> dict:
+    """
+    Analyzes the linear and non-linear components of the model by 
+    calculating coefficients and t-statistics.
 
+    Parameters
+    ----------
+    yhats : list
+        Predicted values.
+    y_actuals : pd.Series
+        Actual values to be compared against the predicted values.
+    y_linear : list
+        Prediction values using standard linear regression.
 
-    Args:
-        yhats (list):Predictiion values
-        y_actuals (pd.Series): Actual values (to be compared to yhats)
-        y_linear (list): Prediction value using standard linear regression
-
-    Returns:
-        lin_comp_analyis: dict containing linear component analysis final values
+    Returns
+    -------
+    dict
+        Dictionary containing linear component analysis results including 
+        coefficients and t-statistics for linear and non-linear parts.
     """
 
 
-    #set up variable assigments (yhat = B1*y_linear + B2*y_nonlinear)
-    x1 = y_linear
-    x2 = yhats - y_linear
-    y = y_actuals
-    
-    #get the sum of squares and sum of products needed for regression calculations
-    ssx1 = sum(x1**2)
-    ssx2 = sum(x2**2)
-    sx1x2 = sum(x1*x2)
-    syx1 = sum(y*x1)
-    syx2 = sum(y*x2)
-    
-    #set up the xTx matrix and find its determinant, use this to set up xTx inverse
-    xTx = np.array([ssx1,sx1x2,sx1x2,ssx2]).reshape(2,2)
-    detxTx = np.linalg.det(xTx)
-    xTx_inverse = (np.array([ssx2, -1*(sx1x2), -1*(sx1x2), ssx1]) / (detxTx)).reshape(2,2)
-    
-    #calculate b1 and b2 using xTx and its determinant
-    b1 = ((ssx2*syx1) - (sx1x2*syx2)) / detxTx
-    b2 = ((ssx1*syx2) - (sx1x2*syx1)) / detxTx
-    
-    #degrees of freedom = N - number of predictors
+    # Variable assignments: yhat = B1 * y_linear + B2 * (yhat - y_linear)
+    x1 = np.array(y_linear)
+    x2 = np.array(yhats) - x1
+    y = np.array(y_actuals)
+
+    # Sum of squares and products required for regression calculations
+    ssx1 = np.sum(x1 ** 2)
+    ssx2 = np.sum(x2 ** 2)
+    sx1x2 = np.sum(x1 * x2)
+    syx1 = np.sum(y * x1)
+    syx2 = np.sum(y * x2)
+
+    # Setting up the xTx matrix and calculating its inverse
+    xTx = np.array([[ssx1, sx1x2], [sx1x2, ssx2]])
+    det_xTx = np.linalg.det(xTx)
+    xTx_inverse = np.array([[ssx2, -sx1x2], [-sx1x2, ssx1]]) / det_xTx
+
+    # Calculating coefficients b1 and b2 using xTx inverse
+    b1 = (ssx2 * syx1 - sx1x2 * syx2) / det_xTx
+    b2 = (ssx1 * syx2 - sx1x2 * syx1) / det_xTx
+
+    # Degrees of freedom
     df = y.shape[0] - 2
-    
-    #get predicted values and residuals, calculate error term variance
-    pred_values = b1*x1 + b2*x2
+
+    # Predicted values and residuals
+    pred_values = b1 * x1 + b2 * x2
     residuals = y - pred_values
-    rss = sum(residuals**2)
+
+    # Error term variance
+    rss = np.sum(residuals ** 2)
     error_variance = rss / df
-    
-    #set up variance/covariance matrix
+
+    # Variance-covariance matrix
     varcovar = error_variance * xTx_inverse
-    
-    #use betas and varcovar to get T statistics
-    tx1 = b1 / np.sqrt(varcovar[0,0])
-    tx2 = b2 / np.sqrt(varcovar[1,1])
-    
-    #reset names of coefficients and t statistics to return a dict
-    lin_comp_analyis = {
-            'beta_linear' : b1,
-            'beta_non_linear' : b2,
-            't_linear' : tx1,
-            't_non_linear' : tx2
+
+    # Calculating t-statistics for b1 and b2
+    t_b1 = b1 / np.sqrt(varcovar[0, 0])
+    t_b2 = b2 / np.sqrt(varcovar[1, 1])
+
+    # Returning the analysis results in a dictionary
+    return {
+        'beta_linear': b1,
+        'beta_nonlinear': b2,
+        't_linear': t_b1,
+        't_nonlinear': t_b2
     }
-    
-    return lin_comp_analyis
 
 
 def model_analysis(yhats, y_actuals, y_linear, fits, combi_compound, 
-                   X_cols, percentile_low=20, percentile_high=80):
-    """Returns a list with the metrics for average Y when Yhat is 
-    low/high and fit is low/high, informativeness-weighted co-occurrence
-    for yhat and y_actuals, and the betas and p-values of the
-    regression of y_actuals on the linear and non-linear components of yhat.
+                   X_cols=None, percentile_low=20, percentile_high=80):
+    """
+    Analyzes model performance by computing various metrics including 
+    average Y for low/high yHat and fit, informativeness-weighted 
+    co-occurrence, and regression coefficients of the linear and 
+    non-linear components.
 
-    Args:
-        yhats (list): Predictiion values
-        y_actuals (pd.Series): Actual values (to be compared to yhats)
-        y_linear (list): Prediction value using standard linear regression
-        fits (list): Prediction fits
-        combi_compound (list): Weighted matrix
-        X_cols (list): Array of variable (column) names
-        percentile_low (int, optional): Defaults to 20.
-        percentile_high (int, optional): Defaults to 80.
+    Parameters
+    ----------
+    yhats : list
+        Prediction values from the model.
+    y_actuals : pd.Series
+        Actual values to be compared against the prediction values.
+    y_linear : list
+        Prediction values using standard linear regression.
+    fits : list
+        Prediction fit values.
+    combi_compound : list
+        Weighted matrix for variable importance analysis.
+    X_cols : list, optional
+        Array of variable (column) names. Defaults to None.
+    percentile_low : int, optional
+        Lower percentile cutoff for high/low splits. Defaults to 20.
+    percentile_high : int, optional
+        Upper percentile cutoff for high/low splits. Defaults to 80.
 
-    Returns:
-        list : Array of pandas tables containing summary statistics for a given prediction
+    Returns
+    -------
+    list
+        List of pandas DataFrames containing summary statistics for the given prediction analysis.
     """
 
-
+    # If no column names are provided, use default range
     if X_cols is None:
-        X_cols = range(0,len(combi_compound))
-    
-    #create the three tables needed for output
-    y_actual_mean = y_actual_means(yhats,y_actuals,fits,percentile_low,percentile_high)
-    ifwco = ifwco_table(yhats,y_actuals,fits,percentile_low,percentile_high)
-    lca = t_stats_and_betas(yhats,y_actuals,y_linear,fits,percentile_low,percentile_high)
-    var_importance = variable_importance(combi_compound=combi_compound, X_cols=X_cols)
-    
-    #pack the tables together in a list
+        X_cols = list(range(len(combi_compound)))
+
+    # Create the analysis tables
+    y_actual_mean = y_actual_means(yhats, y_actuals, fits, percentile_low, percentile_high)
+    ifwco = co_occurrence_summary(yhats, y_actuals, fits, percentile_low, percentile_high)
+    lca = tstats_and_betas(yhats, y_actuals, y_linear, fits, percentile_low, percentile_high)
+    var_importance = variable_importance_by_weights(combi_compound=combi_compound, X_cols=X_cols)
+
+    # Pack the tables together in a list and return
     results_list = [y_actual_mean, ifwco, lca, var_importance]
-    
+
     return results_list
