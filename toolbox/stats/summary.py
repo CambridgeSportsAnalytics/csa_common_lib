@@ -7,9 +7,10 @@ import numpy as np
 import pandas as pd
 
 from .insights import co_occurrence
+from numpy import ndarray
 
 
-def variable_importance_by_weights(combi_compound, X_cols):
+def variable_importance_by_weights(combi_compound:list, X_cols:list):
     """
     Calculate a table for variable importance as a function of the grid
     cell weights. This is NOT relevance-based importance.
@@ -53,21 +54,22 @@ def variable_importance_by_weights(combi_compound, X_cols):
     return pd.DataFrame(result, index=X_cols).sort_values(by='Median', ascending=False)
 
 
-def tstats_and_betas(yhats, y_actuals, y_linear, fits, 
-                      percentile_low=20, percentile_high=80):
+def tstats_and_betas(yhats:ndarray, y_actuals:ndarray, y_linear:ndarray, 
+                     fits:ndarray, percentile_low:int=20, percentile_high:int=80):
     """
     Calculate and return a table of beta coefficients and t-statistics 
     for subsamples of high, mid, and low fit.
 
     Parameters
     ----------
-    yhats : list
-        Prediction values.
-    y_actuals : pd.Series
-        Actual values to be compared to `yhats`.
-    y_linear : list
-        Prediction values using standard linear regression.
-    fits : list
+    yhats : ndarray [N-by-1]
+        Column vector of relevance-based prediction outcomes.
+    y_actuals : ndarray [N-by-1]
+        Column vector of realized dependent variable outcomes for 
+        comparison with prediction outcomes.
+    y_linear : ndarray [N-by-1]
+        Column vector of standard linear regression prediction outcomes.
+    fits : ndarray [N-by-1]
         Prediction fit scores.
     percentile_low : int, optional
         The lower percentile cutoff for subsampling, by default 20.
@@ -130,7 +132,7 @@ def tstats_and_betas(yhats, y_actuals, y_linear, fits,
     return pd.DataFrame(results, index=['Beta', 'T-Statistic'])
 
 
-def y_actual_means(yhats, y_actuals, fits, 
+def y_actual_means(yhats:ndarray, y_actuals:ndarray, fits:ndarray, 
                    percentile_low:int=20, percentile_high:int=80):
     """
     Calculate the mean of actual values (`y_actuals`) at high and low 
@@ -138,11 +140,12 @@ def y_actual_means(yhats, y_actuals, fits,
 
     Parameters
     ----------
-    yhats : list
-        Prediction values.
-    y_actuals : pd.Series
-        Actual values to be compared to `yhats`.
-    fits : list
+    yhats : ndarray [N-by-1]
+        Column vector of relevance-based prediction outcomes.
+    y_actuals : ndarray [N-by-1]
+        Column vector of realized dependent variable outcomes for 
+        comparison with prediction outcomes.
+    fits : ndarray [N-by-1]
         Prediction fit scores.
     percentile_low : int, optional
         The lower percentile cutoff for subsampling, by default 20.
@@ -202,7 +205,7 @@ def y_actual_means(yhats, y_actuals, fits,
     return pd.DataFrame(results, index=['Y Actual Mean']).T
 
 
-def split_data_by_percentile(data, percentile_low:int=20, 
+def split_data_by_percentile(data:ndarray, percentile_low:int=20, 
                              percentile_high:int=80):
     """
     Determine the indices for high, mid, and low ranges based 
@@ -210,7 +213,7 @@ def split_data_by_percentile(data, percentile_low:int=20,
 
     Parameters
     ----------
-    data : np.ndarray
+    data : ndarray
         The data for which the percentile cutoffs are calculated.
     percentile_low : int, optional
         The lower percentile cutoff for low data, by default 20.
@@ -220,11 +223,11 @@ def split_data_by_percentile(data, percentile_low:int=20,
     Returns
     -------
     tuple of np.ndarray
-        - high_indexes : np.ndarray
+        - high_indexes : ndarray
             Indices of data values that fall in the high percentile range.
-        - mid_indexes : np.ndarray
+        - mid_indexes : ndarray
             Indices of data values that fall in the mid percentile range.
-        - low_indexes : np.ndarray
+        - low_indexes : ndarray
             Indices of data values that fall in the low percentile range.
     """
     
@@ -240,7 +243,7 @@ def split_data_by_percentile(data, percentile_low:int=20,
     return high_indexes, mid_indexes, low_indexes
 
 
-def co_occurrence_summary(yhat:list, y_actual: pd.Series, fits:list, 
+def co_occurrence_summary(yhat:ndarray, y_actual:ndarray, fits:ndarray, 
                          percentile_low:int = 20, percentile_high:int = 80) -> pd.DataFrame:
     """
     Generates a summary table of Informativeness-weighted Co-occurrence (IWCO)
@@ -248,12 +251,13 @@ def co_occurrence_summary(yhat:list, y_actual: pd.Series, fits:list,
 
     Parameters
     ----------
-    yhat : list
-        Predicted values.
-    y_actual : pd.Series
-        Actual values to be compared against the predicted values.
-    fits : list
-        Prediction fits.
+    yhats : ndarray [N-by-1]
+        Column vector of relevance-based prediction outcomes.
+    y_actuals : ndarray [N-by-1]
+        Column vector of realized dependent variable outcomes for 
+        comparison with prediction outcomes.
+    fits : ndarray [N-by-1]
+        Prediction fit scores.
     percentile_low : int, optional
         Lower percentile cutoff for categorizing high, mid, and low groups. 
         Default is 20.
@@ -328,8 +332,8 @@ def co_occurrence_summary(yhat:list, y_actual: pd.Series, fits:list,
     return pd.DataFrame(results, index=['Informativeness-weighted Co-Occurrence']).T
 
 
-def _calculate_cooccurrence_by_prediction_group(yhat:np.ndarray,
-        y_actual:np.ndarray, fits:np.ndarray, group_indices:np.ndarray, 
+def _calculate_cooccurrence_by_prediction_group(yhat:ndarray,
+        y_actual:ndarray, fits:ndarray, group_indices:ndarray, 
         percentile_low:int=20, percentile_high:int=80) -> tuple:
     """
     Calculates the informativeness-weighted co-occurrence (IWCO) values
@@ -338,12 +342,13 @@ def _calculate_cooccurrence_by_prediction_group(yhat:np.ndarray,
 
     Parameters
     ----------
-    yhat : ndarray [N-by-1]
-        Array of predicted values.
-    y_actual : ndarray [N-by-1]
-        Array of actual values to be compared against the predicted values.
+    yhats : ndarray [N-by-1]
+        Column vector of relevance-based prediction outcomes.
+    y_actuals : ndarray [N-by-1]
+        Column vector of realized dependent variable outcomes for 
+        comparison with prediction outcomes.
     fits : ndarray [N-by-1]
-        Array of prediction fits.
+        Prediction fit scores.
     group_indices : ndarray [N-by-1]
         Indices representing the specific group (e.g., high or low yhat) 
         to be analyzed.
@@ -398,19 +403,20 @@ def _calculate_cooccurrence_by_prediction_group(yhat:np.ndarray,
     return iwco_fullsample, iwco_highfit, iwco_lowfit
 
 
-def linear_component_analysis(yhats: list, y_actuals: pd.Series, y_linear: list) -> dict:
+def linear_component_analysis(yhats:ndarray, y_actuals:ndarray, y_linear:ndarray) -> dict:
     """
     Analyzes the linear and non-linear components of the model by 
     calculating coefficients and t-statistics.
 
     Parameters
     ----------
-    yhats : list
-        Predicted values.
-    y_actuals : pd.Series
-        Actual values to be compared against the predicted values.
-    y_linear : list
-        Prediction values using standard linear regression.
+    yhats : ndarray [N-by-1]
+        Column vector of relevance-based prediction outcomes.
+    y_actuals : ndarray [N-by-1]
+        Column vector of realized dependent variable outcomes for 
+        comparison with prediction outcomes.
+    y_linear : ndarray [N-by-1]
+        Column vector of standard linear regression prediction outcomes.
 
     Returns
     -------
@@ -468,8 +474,9 @@ def linear_component_analysis(yhats: list, y_actuals: pd.Series, y_linear: list)
     }
 
 
-def model_analysis(yhats, y_actuals, y_linear, fits, combi_compound, 
-                   X_cols=None, percentile_low=20, percentile_high=80):
+def model_analysis(yhats:ndarray, y_actuals:ndarray, y_linear:ndarray, 
+                   fits:ndarray, combi_compound:list, X_cols:list=None, 
+                   percentile_low:int=20, percentile_high:int=80):
     """
     Analyzes model performance by computing various metrics including 
     average Y for low/high yHat and fit, informativeness-weighted 
@@ -478,16 +485,17 @@ def model_analysis(yhats, y_actuals, y_linear, fits, combi_compound,
 
     Parameters
     ----------
-    yhats : list
-        Prediction values from the model.
-    y_actuals : pd.Series
-        Actual values to be compared against the prediction values.
-    y_linear : list
-        Prediction values using standard linear regression.
-    fits : list
-        Prediction fit values.
+    yhats : ndarray [N-by-1]
+        Column vector of relevance-based prediction outcomes.
+    y_actuals : ndarray [N-by-1]
+        Column vector of realized dependent variable outcomes for 
+        comparison with prediction outcomes.
+    y_linear : ndarray [N-by-1]
+        Column vector of standard linear regression prediction outcomes.
+    fits : ndarray [N-by-1]
+        Prediction fit scores.
     combi_compound : list
-        Weighted matrix for variable importance analysis.
+        Array of weighted matrix for variable importance analysis.
     X_cols : list, optional
         Array of variable (column) names. Defaults to None.
     percentile_low : int, optional
@@ -498,7 +506,8 @@ def model_analysis(yhats, y_actuals, y_linear, fits, combi_compound,
     Returns
     -------
     list
-        List of pandas DataFrames containing summary statistics for the given prediction analysis.
+        List of pandas DataFrames containing summary statistics for 
+        the given prediction analysis.
     """
 
     # If no column names are provided, use default range
