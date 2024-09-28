@@ -23,6 +23,7 @@ def convert_to_float32(obj):
         The converted object with all numerical values as float32, or the 
         original object if conversion is not applicable.
     """
+    
     if isinstance(obj, dict):
         # Recursively convert all values in the dictionary to float32.
         return {k: convert_to_float32(v) for k, v in obj.items()}
