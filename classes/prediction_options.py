@@ -117,8 +117,7 @@ class PredictionOptions:
         Returns:
             PredictionOptions: PredictionOptions obj 
         """
-
-
+        
         new_copy = copy.deepcopy(self)
         for key, value in kwargs.items():
             setattr(new_copy, key, value)
@@ -165,7 +164,6 @@ class MaxFitOptions(PredictionOptions):
         When attempting to set or get an attribute that does not 
         exist in the options dictionary.        
     """
-    
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
