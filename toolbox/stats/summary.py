@@ -120,13 +120,13 @@ def tstats_and_betas(yhats:ndarray, y_actuals:ndarray, y_linear:ndarray,
     # Compile results into a DataFrame
     results = {
         'Full Sample Linear Component': [full_sample['beta_linear'], full_sample['t_linear']],
-        'Full Sample Excess RBP Component': [full_sample['beta_non_linear'], full_sample['t_non_linear']],
+        'Full Sample Excess RBP Component': [full_sample['beta_nonlinear'], full_sample['t_nonlinear']],
         'High Fit Sample Linear Component': [high_fit['beta_linear'], high_fit['t_linear']],
-        'High Fit Sample Excess RBP Component': [high_fit['beta_non_linear'], high_fit['t_non_linear']],
+        'High Fit Sample Excess RBP Component': [high_fit['beta_nonlinear'], high_fit['t_nonlinear']],
         'Mid Fit Sample Linear Component': [mid_fit['beta_linear'], mid_fit['t_linear']],
-        'Mid Fit Sample Excess RBP Component': [mid_fit['beta_non_linear'], mid_fit['t_non_linear']],
+        'Mid Fit Sample Excess RBP Component': [mid_fit['beta_nonlinear'], mid_fit['t_nonlinear']],
         'Low Fit Sample Linear Component': [low_fit['beta_linear'], low_fit['t_linear']],
-        'Low Fit Sample Excess RBP Component': [low_fit['beta_non_linear'], low_fit['t_non_linear']]
+        'Low Fit Sample Excess RBP Component': [low_fit['beta_nonlinear'], low_fit['t_nonlinear']]
     }
     
     return pd.DataFrame(results, index=['Beta', 'T-Statistic'])
@@ -329,7 +329,7 @@ def co_occurrence_summary(yhat:ndarray, y_actual:ndarray, fits:ndarray,
         'Low Prediction w/ Low Fit': low_predictions_low_fit
     }
 
-    return pd.DataFrame(results, index=['Informativeness-weighted Co-Occurrence']).T
+    return pd.DataFrame(results, index=['Informativeness-Weighted Co-Occurrence']).T
 
 
 def _calculate_cooccurrence_by_prediction_group(yhat:ndarray,
