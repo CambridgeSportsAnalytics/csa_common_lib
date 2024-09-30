@@ -53,3 +53,5 @@ def is_obj_userdefined_class(obj):
 
     # Check if the object is a class and not from the built-in module.
     return inspect.isclass(obj_type) and obj_type.__module__ != 'builtins'
+
+

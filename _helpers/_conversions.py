@@ -71,3 +71,27 @@ def convert_dict_to_list(obj):
     else:
         # Return the object as-is if no conversion is applicable.
         return obj
+    
+    
+def convert_ndarray_to_list(obj):
+    """
+    Recursively converts numpy ndarrays within an object to lists.
+    
+    Parameters:
+    obj (any): The input object which may contain numpy ndarrays.
+
+    Returns:
+    any: The converted object with all numpy ndarrays turned into lists.
+    """
+
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {k: convert_ndarray_to_list(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_ndarray_to_list(item) for item in obj]
+    elif isinstance(obj, tuple):
+        return tuple(convert_ndarray_to_list(item) for item in obj)
+    else:
+        return obj
+    
