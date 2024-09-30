@@ -1,4 +1,5 @@
 import inspect
+import numpy as np
 
 
 def class_obj_to_dict(obj):
