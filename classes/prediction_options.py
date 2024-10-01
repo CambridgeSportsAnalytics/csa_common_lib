@@ -54,9 +54,15 @@ class PredictionOptions:
 
 
     def __getattr__(self, name):
+        # Avoid recursion by checking if the attribute is already present in __dict__
+        if name in self.__dict__:
+            return self.__dict__[name]
+
         # Check if 'options' is in self.__dict__ to avoid KeyError
         if 'options' in self.__dict__ and name in self.__dict__['options']:
             return self.__dict__['options'][name]
+
+        # Raise an AttributeError if the attribute is not found
         raise AttributeError(f"'PredictionOptions' object has no attribute '{name}'")
 
 
@@ -73,13 +79,6 @@ class PredictionOptions:
         for key, value in self.options.items():
             print(f"{key}: {value}")
 
-    
-    # # Commented out because this will show Options' contents for each
-    # # reference call to the options class. This is useful to uncomment
-    # # for deep debugging or as example code.
-    # def __repr__(self):
-    #     class_type = str(type(self)).split(".")[-1].split("'")[0]
-    #     f"{class_type}\n{self.display()}\n"
 
 
     def init_from_dict(self, inputs):
@@ -118,9 +117,17 @@ class PredictionOptions:
             PredictionOptions: PredictionOptions obj 
         """
         
-        new_copy = copy.deepcopy(self)
+         # Create a new instance of PredictionOptions to avoid recursive loop in .deepcopy()
+        new_copy = self.__class__()
+
+        # Copy attributes from the original instance to the new instance
+        for attr, value in self.__dict__.items():
+            setattr(new_copy, attr, value)
+
+        # Overwrite attributes with passed parameter
         for key, value in kwargs.items():
             setattr(new_copy, key, value)
+
         return new_copy
 
 
