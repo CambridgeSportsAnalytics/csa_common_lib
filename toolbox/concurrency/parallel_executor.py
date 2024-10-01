@@ -3,9 +3,12 @@
 import numpy as np  # Third-party library import
 
 # Local application / library-specific imports
-from concurrent.futures import ProcessPoolExecutor  # For parallel processing
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor  # For parallel processing
 from csa_common_lib.toolbox import _notifier # For notification handling
+from dotenv import load_dotenv
 
+# Import api credentials from a .env file as environment variables
+load_dotenv() 
 
 def run_tasks_local(inputs, dispatcher, max_workers:int, notifier):
     """
@@ -83,7 +86,7 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
     notifier.disable_notifier()
 
     # Execute tasks in multi-threaded pool
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         jobs = list(executor.map(dispatcher, inputs))
 
     # Unpack job_id and job_code using list comprehension
@@ -92,7 +95,7 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
     # Once we have all the job_id and job_codes for all the corresponding
     # prediction tasks, we can get the results from CSA's server
     inputs_for_get = [
-        (job_id[q], job_code[q]) for q in range(jobs.shape[1])
+        (job_id[q], job_code[q]) for q in range(len(jobs))
     ]
     
     # Dispatch the get_results task in a multi-threaded pool

@@ -99,7 +99,7 @@ def slice_matrices(q:int, slice_type:str, y_matrix, theta_matrix, X):
         case "theta":
             y = np.atleast_2d(y_matrix)
             # Extract the q-th row vector from theta_matrix
-            theta = np.atleast_2d(theta_matrix[q, :])
+            theta = np.atleast_2d(theta_matrix[q])
         
         case _:
             raise ValueError("psrlib_async:slice_matrices:Invalid slice_type")

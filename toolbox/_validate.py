@@ -52,7 +52,7 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
             _check_key(varargin, 'most_eval', is_strict)
             _check_key(varargin, 'eval_type', is_strict)
             
-        elif function_type == PSRFunction.GRID_SINGULARITY:
+        elif function_type == PSRFunction.GRID_SINGULARITY or function_type == PSRFunction.GRID:
             _check_key(varargin, 'stepsize', is_strict)
             _check_key(varargin, 'most_eval', is_strict)
             _check_key(varargin, 'eval_type', is_strict)
@@ -112,7 +112,7 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
 
         
         # validate the rest of the arguments
-        validate_args.get(key, f'{key} is not expected.')(key, value, K)
+        validate_args.get(key, value)
         
         # # attribute_combi is a [1-by-K] vector of zeros and ones
         if key == 'attribute_combi':
