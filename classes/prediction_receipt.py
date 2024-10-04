@@ -72,8 +72,7 @@ class PredictionReceipt:
     
 
     def save_receipt(self):
-        """Saves prediction_receipts as json in the local directory. Will 
-        change this soon
+        """Saves prediction_receipts as .json file in the local directory.
         """
 
         # Convert any nd.arrays to lists (to be json serializable)
