@@ -1,4 +1,4 @@
-from csanalytics_local.classes._vault_metadata import VaultMetadata
+from csa_local_compute.classes._vault_metadata import VaultMetadata
 from csa_common_lib.classes.prediction_options import PredictionOptions
 
 
