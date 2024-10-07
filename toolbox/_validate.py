@@ -41,7 +41,7 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
         # then we want to validate optional arguments as well.
         _check_key(varargin, 'cov_inv', is_strict)
         
-        if function_type == PSRFunction.PREDICT:
+        if function_type == PSRFunction.PSR:
             _check_key(varargin, 'threshold', is_strict)
             _check_key(varargin, 'most_eval', is_strict)
             _check_key(varargin, 'eval_type', is_strict)

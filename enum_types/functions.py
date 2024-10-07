@@ -9,7 +9,7 @@ class PSRFunction(Enum):
     Enum : PSR Function Types
         Partial Sample Regression function types.
     """    
-    PREDICT = (0, 'predict')
+    PSR = (0, 'psr')
     MAXFIT = (1, 'maxfit')
     GRID = (2, 'grid')
     GRID_SINGULARITY = (3, 'grid_singularity')
