@@ -4,7 +4,7 @@ import json
 import uuid
 from datetime import datetime
 from psr_lambda._private._helpers import calc_crc64
-from csa_common_lib._helpers._conversions import convert_ndarray_to_list
+from csa_common_lib.helpers._conversions import convert_ndarray_to_list
 
 class PredictionReceipt:
     """Saves and orgnaizes input dimensions, prediction durations, 
