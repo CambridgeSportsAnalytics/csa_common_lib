@@ -143,6 +143,11 @@ def is_notifier_enabled():
 
 
 def get_notifier_status():
+    
+    # Defaults to true if user does not specify to prevent system failure
+    if os.environ.get('CSA_CONSOLE_NOTIFIER') is None:
+        os.environ['CSA_CONSOLE_NOTIFIER'] = 'my_value'
+
     return os.environ.get('CSA_CONSOLE_NOTIFIER', 'False').lower() == 'true'
     
     
