@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime
 from psr_lambda._private._helpers import calc_crc64
 from csa_common_lib.helpers._conversions import convert_ndarray_to_list
+from csa_common_lib.helpers._os import is_valid_path
 
 class PredictionReceipt:
     """Saves and orgnaizes input dimensions, prediction durations, 
@@ -39,41 +40,32 @@ class PredictionReceipt:
         self.X_checksum = calc_crc64(pickle.dumps(X)) # convert X to bytes and get checksum
         self.theta_checksum = calc_crc64(pickle.dumps(theta)) # convert theta to bytes and get checksum
 
-    def basic_display(self):
+
+    def display(self, detail:bool=False):
         """Displays basic validation info. Excludes lengthy results objects
         """        
         attributes = dir(self)
-        remove_attributes = ['options', 'yhat']
-
-        print("\nBasic Display (Call PredictionReceipt.full_display() to see more)\n")
-        attributes = [attr for attr in attributes if attr not in remove_attributes]
-
-
-        for attr in attributes:
-            if not attr.startswith('__') and not callable(getattr(self, attr)):
-                print(f"{attr}: {getattr(self, attr)}")
         
+        # If suer does not request a detailed display(), remove input options and yhat array
+        if detail is False:
+            remove_attributes = ['options','yhat']
+            attributes = [attr for attr in attributes if attr not in remove_attributes]
 
-    def full_display(self):
-        """Displays all validation info
-        """
-
-        attributes = dir(self)
-        remove_attributes = ['options']
-
-        print("\nFull Display\n")
-        attributes = [attr for attr in attributes if attr not in remove_attributes]
+        # Print out a menu of accessible attributes in the receipt
         for attr in attributes:
             if not attr.startswith('__') and not callable(getattr(self, attr)):
                 print(f"{attr}: {getattr(self, attr)}")
-
-        print("\n Input Options: \n")
-        self.options.display()
     
 
-    def save_receipt(self):
+    def save_receipt(self, path:str):
         """Saves prediction_receipts as .json file in the local directory.
         """
+
+        # Validate that the user supplied a valid path before saving .json
+        try:
+            is_valid_path(path)
+        except (FileNotFoundError, PermissionError) as e:
+            print(f"Error: {e}")
 
         # Convert any nd.arrays to lists (to be json serializable)
         for attr in dir(self):
@@ -82,11 +74,12 @@ class PredictionReceipt:
                 setattr(self, attr, attr_value.tolist())
 
         
+        
         # Turn receipt object into dictionary so that it can be saved as a json file
         obj_dict = self.__dict__
 
         # Convert timestamp to filename
         timestamp = self.timestamp.replace(" ", "_").replace(":", "-")
         # Save to a JSON file
-        with open(f'{timestamp}.json', 'w') as json_file:
+        with open(f'{path}{timestamp}.json', 'w') as json_file:
             json.dump(obj_dict, json_file)
