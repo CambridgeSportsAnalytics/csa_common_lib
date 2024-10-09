@@ -18,6 +18,7 @@ def is_valid_path(path:str):
 
     return True  # If no exceptions were raised, the path is valid
 
+
 def is_file_path(s: str):
     """Checks to see if string passed in is for a file path that exists
 
