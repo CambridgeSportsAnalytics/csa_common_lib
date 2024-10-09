@@ -26,7 +26,7 @@ class PredictionReceipt:
         exist in the receipt dictionary.
     """
 
-    def __init__(self, model_type, y, X, theta, options, yhat, prediction_duration=None):
+    def __init__(self, model_type, y, X, theta, options, yhat, prediction_duration=None, seed:int=-1):
         self.prediction_id = str(uuid.uuid4()) # Unique id for the prediction request
         self.timestamp = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) # Timestamp of the receipt
         self.prediction_duration =  round(prediction_duration, 3) # Time to run a prediction (in seconds) 
@@ -39,7 +39,7 @@ class PredictionReceipt:
         self.y_checksum = calc_crc64(pickle.dumps(y)) # convert y to bytes and get checksum
         self.X_checksum = calc_crc64(pickle.dumps(X)) # convert X to bytes and get checksum
         self.theta_checksum = calc_crc64(pickle.dumps(theta)) # convert theta to bytes and get checksum
-
+        self.seed = seed # User provided (if applciable). Otherwise will default to -1 
 
     def display(self, detail:bool=False):
         """Displays basic validation info. Excludes lengthy results objects
