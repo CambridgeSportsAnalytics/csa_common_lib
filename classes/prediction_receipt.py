@@ -3,9 +3,8 @@ import pickle
 import json
 import uuid
 from datetime import datetime
-from psr_lambda._private._helpers import calc_crc64
 from csa_common_lib.helpers._conversions import convert_ndarray_to_list
-from csa_common_lib.helpers._os import is_valid_path
+from csa_common_lib.helpers._os import is_valid_path, calc_crc64
 
 class PredictionReceipt:
     """Saves and orgnaizes input dimensions, prediction durations, 

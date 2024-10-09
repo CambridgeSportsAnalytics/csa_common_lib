@@ -5,10 +5,6 @@ import numpy as np  # Third-party library import
 # Local application / library-specific imports
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor  # For parallel processing
 from csa_common_lib.toolbox import _notifier # For notification handling
-from dotenv import load_dotenv
-
-# Import api credentials from a .env file as environment variables
-load_dotenv() 
 
 def run_tasks_local(inputs, dispatcher, max_workers:int, notifier):
     """
