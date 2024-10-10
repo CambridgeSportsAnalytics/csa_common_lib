@@ -1,5 +1,7 @@
-import numpy as np
 import os
+import numpy as np
+from datetime import datetime
+from typing import Any, Dict, List, Union
 
 # Conditionally import pandas if not in a Lambda environment
 if os.getenv('LAMBDA_ENV') is None:
@@ -95,3 +97,32 @@ def convert_ndarray_to_list(obj):
     else:
         return obj
     
+
+def convert_datetime_to_string(data: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any], List[Any]]:
+    """
+    Recursively converts datetime objects in a dictionary or list to strings.
+    
+    Parameters
+    ----------
+    data : Union[Dict[str, Any], List[Any]]
+        The input data which can be a dictionary or list.
+
+    Returns
+    -------
+    Union[Dict[str, Any], List[Any]]
+        The input data with datetime objects converted to strings.
+    """
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = value.strftime('%Y-%m-%d %H:%M:%S')  # Convert datetime to string
+            elif isinstance(value, (dict, list)):
+                data[key] = convert_datetime_to_string(value)  # Recursive call for nested structures
+    elif isinstance(data, list):
+        for index in range(len(data)):
+            if isinstance(data[index], datetime):
+                data[index] = data[index].strftime('%Y-%m-%d %H:%M:%S')  # Convert datetime to string
+            elif isinstance(data[index], (dict, list)):
+                data[index] = convert_datetime_to_string(data[index])  # Recursive call for nested structures
+
+    return data
