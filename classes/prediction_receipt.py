@@ -56,13 +56,17 @@ class PredictionReceipt:
                 print(f"{attr}: {getattr(self, attr)}")
     
 
-    def save_receipt(self, path:str):
-        """Saves prediction_receipts as .json file in the local directory.
+    def save_receipt(self, path:str='', file_name:str=None):
+        """Saves prediction_receipts as .json file 
         """
+
+        # Convert timestamp to filename if not supplied
+        if file_name is None:
+            file_name = self.timestamp.replace(" ", "_").replace(":", "-")
 
         # Validate that the user supplied a valid path before saving .json
         try:
-            is_valid_path(path)
+            is_valid_path(path + file_name)
         except (FileNotFoundError, PermissionError) as e:
             print(f"Error: {e}")
 
@@ -71,14 +75,11 @@ class PredictionReceipt:
             attr_value = getattr(self, attr)
             if isinstance(attr_value, np.ndarray):
                 setattr(self, attr, attr_value.tolist())
-
         
         
         # Turn receipt object into dictionary so that it can be saved as a json file
         obj_dict = self.__dict__
 
-        # Convert timestamp to filename
-        timestamp = self.timestamp.replace(" ", "_").replace(":", "-")
         # Save to a JSON file
-        with open(f'{path}{timestamp}.json', 'w') as json_file:
+        with open(f'{path}{file_name}.json', 'w') as json_file:
             json.dump(obj_dict, json_file)
