@@ -10,3 +10,6 @@ Description of module should go here.
 from .classes.prediction_options import GridOptions
 from .classes.prediction_options import MaxFitOptions
 from .classes.prediction_options import PredictionOptions
+
+from .classes.prediction_results import PredictionResults
+from .classes.prediction_receipt import PredictionReceipt
