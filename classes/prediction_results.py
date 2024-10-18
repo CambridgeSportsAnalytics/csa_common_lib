@@ -23,47 +23,9 @@ class PredictionResults:
 
         # compute weights concentration and add to class
         self.weights_concentration = [np.std(row) for row in self.weights]
-        if hasattr(self, 'weights_compound'):
-            self.weights_concentration_compound = [np.std(row) for row in self.weights_compound]
 
     def _initialize_attributes(self):
-        allowed_keys = [
-            'yhat', 
-            'weights', 
-            'weights_excluded', 
-            'relevance', 
-            'similarity',
-            'info_x', 
-            'info_theta', 
-            'include', 
-            'lambda_sq', 
-            'n', 
-            'K', 
-            'phi',
-            'r_star', 
-            'r_star_percent', 
-            'most_eval', 
-            'eval_type', 
-            'adjusted_fit',
-            'fit', 
-            'rho', 
-            'agreement', 
-            'outlier_influence', 
-            'asymmetry', 
-            'variable_importance', 
-            'y_linear',
-            'yhat_grid', 
-            'weights_grid', 
-            'adjusted_fit_grid', 
-            'max_attributes',
-            'combi_grid', 
-            'yhat_compound', 
-            'adjusted_fit_compound', 
-            'fit_compound',
-            'combi_compound',
-            'weights_compound', 
-            'maxfit_index_grid'
-        ]
+        
 
         if not self.raw_data:
             return
@@ -77,9 +39,10 @@ class PredictionResults:
         if not isinstance(first_item, dict):
             raise TypeError("PredictionResults: Items in raw_data must be dictionaries")
         
-        keys_to_populate = [key for key in first_item if key in allowed_keys]
+        # keys_to_populate = [key for key in first_item if key in allowed_keys]
+        allowed_keys = list(self.raw_data[0].keys()) # Pull results keys that we want to capture
 
-        for key in keys_to_populate:
+        for key in allowed_keys:
             values = []
             for item in self.raw_data:
                 if key in item:
