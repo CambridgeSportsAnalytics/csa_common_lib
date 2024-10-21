@@ -3,20 +3,22 @@ import numpy as np
 
 
 class PredictionOptions:
-    """Supports a master default list of all possible input options 
-    used by predict, maxfit and optvar. Some models overlap in input 
-    options but setting a parameter that is not used by a given model will
-    not affect it.
+    """A configurable options class for relevance-based predictions, including
+    predict, maxfit, and grid models. This class provides a comprehensive 
+    list of all possible input parameters, ensuring flexibility across 
+    different prediction models. While some parameters are shared across 
+    inherrited models, setting an unused option for a specific model 
+    will have no effect, ensuring compatibility and ease of use.
     
-    threshold : float or ndarray[1-by-T], optional (default=None)
-        Threshold to evaluate relevant observations.
-        If threshold=None, the model will evaluate across thresholds
-        from [0, 0.90) in 0.10 increments.
+    threshold : float or ndarray [1-by-T], optional (default=None)
+        Evaluation threshold to determine whether observations will be 
+        included or excluded from the censor function in the 
+        partial-sample regression. If threshold = None, the model 
+        will evaluate across thresholds from [0, 0.90) in 0.10 increments.
     is_threshold_percent : bool, optional (default=True)
         Specify whether threshold is in percentage (decimal) units.
     most_eval : bool, optional (default=True)
-        Specify the direction of threshold evluation on the corresponding
-        censor type.
+        Specify the direction of the censor evaluation of the threshold.
         True:  [eval_type] score > threshold
         False: [eval_type] score < threshold
     eval_type : str, optional (default="both")
@@ -141,12 +143,12 @@ class MaxFitOptions(PredictionOptions):
         Max fit solves for the optimal threshold that maximizes the 
         fit (or adjusted fit) value.
     threshold_range : tuple or ndarray
-        Min/max range for evaluating maxfit threshold, by default (0,1)
+        Min/max range for evaluating maxfit threshold, by default (0, 0.20, 0.50, 0.80)
         If an ndarray is passed in, max fit evaluates over the specified
         threshold values in the ndarray
     stepsize : float, optional (default=0.20)
         Stepsize to evaluate range of thresholds to solve for max fit.
-        Decreasing stepsize will increase the granularity of the search.
+        Decreasing stepsize will increase the grid resolution.
     most_eval : bool, optional (default=True)
         Specify the direction of threshold evluation on the censor score.
         The censor score is determined by eval_type.
@@ -191,7 +193,7 @@ class GridOptions(MaxFitOptions):
     Inherits from MaxFitOptions and adds additional options.
     
     threshold_range : tuple or ndarray
-        Min/max range for evaluating maxfit threshold, by default (0,1)
+        Min/max range for evaluating maxfit threshold, by default (0, 0.20, 0.50, 0.80)
         If an ndarray is passed in, max fit evaluates over the specified
         threshold values in the ndarray
     stepsize : float, optional (default=0.20)
@@ -218,7 +220,8 @@ class GridOptions(MaxFitOptions):
         computational time, we suggest balancing computation time
         and memory with the maximum number of cells to evaluate.
     k : int, optional (default=1)
-        Lower bound for the number of variables to include, by default 1.
+        Lower bound for the number of variables to include for any 
+        combination Q, by default 1.
     _is_retain_all_grid_objects : boolean, optional (default=False)
         Saves and returns the weights grid for all censors, this is the
         the largest matrix in yhat_details. This is typically set to True
@@ -241,7 +244,7 @@ class GridOptions(MaxFitOptions):
         super().__init__(**kwargs)
         self.options.update({
             'attribute_combi': None,
-            'max_iter': 1_000,
+            'max_iter': 1_000_000,
             'k': 1,
             '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
         })
