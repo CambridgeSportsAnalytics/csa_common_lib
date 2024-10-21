@@ -66,7 +66,8 @@ class PredictionReceipt:
 
         # Validate that the user supplied a valid path before saving .json
         try:
-            is_valid_path(path + file_name)
+            if path != '':
+                is_valid_path(path)
         except (FileNotFoundError, PermissionError) as e:
             print(f"Error: {e}")
 
