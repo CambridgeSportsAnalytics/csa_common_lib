@@ -1,6 +1,5 @@
-import copy
 import numpy as np
-
+from random import getrandbits
 
 class PredictionOptions:
     """A configurable options class for relevance-based predictions, including
@@ -247,6 +246,7 @@ class GridOptions(MaxFitOptions):
             'max_iter': 1_000_000,
             'k': 1,
             '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
+            '_seed': getrandbits(32) # initialize for combi 
         })
         
         # Update the options dictionary with any provided kwargs
