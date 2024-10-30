@@ -1,30 +1,45 @@
-# `csa_common_lib`
+# Cambridge Sports Analytics Common Library
 
-`csa_common_lib` is a shared library designed to provide utility modules, class definitions, enumerations, and helper functions for the CSA Prediction Engine Python client. It standardizes and simplifies complex operations across different parts of the system.
+The **CSA Common Lib** is a shared library designed to provide utility modules, class definitions, enumerations, and helper functions for the **CSA Prediction Engine** package. It standardizes and simplifies complex operations across different parts of the system.
 
-## Folder Structure
+## Package Structure
 
-- **`classes/`**: Contains class definitions for prediction-related data structures.
-  - `prediction_options.py`: Defines options and configurations for predictions.
-  - `prediction_receipt.py`: Structures data related to prediction receipts.
-  - `prediction_results.py`: Contains classes for handling prediction results.
-  
-- **`enum_types/`**: Contains enumerations that categorize various elements of the system.
-  - `exit_flags.py`: Defines exit flag states used during execution.
-  - `functions.py`: Enumerates available functions in the system.
-  - `job_types.py`: Enumerates different job types for concurrency.
+The package is structured as follows:
 
-- **`helpers/`**: Provides helper functions for common low-level tasks.
-  - `_arrays.py`: Array manipulation and utility functions.
-  - `_conversions.py`: Data conversion utilities.
-  - `_os.py`: Functions for interacting with the operating system.
+```plaintext
+csa_common_lib/
+├── classes/
+   ├── prediction_options.py       # Configurations and options for predictions
+   ├── prediction_receipt.py       # Structures data for prediction receipts
+   └── prediction_results.py       # Handles and organizes prediction results
 
-- **`toolbox/`**: A general-purpose set of utilities.
-  - **`classes/utilities.py`**: Utilities for class objects.
-  - **`concurrency/`**: Tools for concurrent execution.
-  - **`database/`**: Database related tools and utilities.
-  - **`npz/`**: NPZ utility functions.
-  - **`stats/`**: Provides statistical functions and tools.
+├── enum_types/
+   ├── exit_flags.py               # Execution exit flag states
+   ├── functions.py                # Enumerates system functions
+   └── job_types.py                # Defines job types for concurrency management
+
+├── helpers/
+   ├── _arrays.py                  # Array manipulation and utility functions
+   ├── _conversions.py             # Data type conversion utilities
+   └── _os.py                      # Operating system interaction functions
+
+└── toolbox/
+    ├── classes/
+       └── utilities.py            # Utility functions for working with classes
+    
+    ├── concurrency/
+       ├── parallel_executor.py    # Parallel execution tools
+       └── parallel_helpers.py     # Helper functions for concurrency
+     
+    ├── database/
+       └── information.py          # Database utility and information tools
+     
+    ├── npz/
+       └── io_operations.py        # NPZ file input/output utilities
+     
+    └── stats/
+       └──                         # Statistical computation tools and functions
+```
 
 ## Installation
 
@@ -48,4 +63,4 @@ from csa_common_lib.classes.prediction_options import {
 
 
 ## License
-(c) 2024 Cambridge Sports Analytics. All rights reserved.
+(c)2023-2024 Cambridge Sports Analytics. All rights reserved.
