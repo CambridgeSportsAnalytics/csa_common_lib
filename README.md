@@ -63,4 +63,4 @@ from csa_common_lib.classes.prediction_options import {
 
 
 ## License
-(c)2023-2024 Cambridge Sports Analytics. All rights reserved.
+(c)2023-2024 Cambridge Sports Analytics, LLC. All rights reserved.
