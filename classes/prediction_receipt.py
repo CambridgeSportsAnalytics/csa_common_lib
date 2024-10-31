@@ -3,6 +3,7 @@ import pickle
 import json
 import uuid
 from datetime import datetime
+from random import getrandbits
 from csa_common_lib.helpers._conversions import convert_ndarray_to_list
 from csa_common_lib.helpers._os import is_valid_path, calc_crc64
 
@@ -25,10 +26,10 @@ class PredictionReceipt:
         exist in the receipt dictionary.
     """
 
-    def __init__(self, model_type, y, X, theta, options, yhat, prediction_duration=None, seed:int=-1):
+    def __init__(self, model_type, y, X, theta, options, yhat, prediction_duration=0):
         self.prediction_id = str(uuid.uuid4()) # Unique id for the prediction request
         self.timestamp = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) # Timestamp of the receipt
-        self.prediction_duration =  round(prediction_duration, 3) # Time to run a prediction (in seconds) 
+        self.prediction_duration = round(prediction_duration, 3) # Time to run a prediction (in seconds) 
         self.model_type = str(model_type) # Prediction model that was run
         self.X_dim = X.shape  # Save input dimensions
         self.y_dim = y.shape  # Save input dimensions
@@ -38,7 +39,8 @@ class PredictionReceipt:
         self.y_checksum = calc_crc64(pickle.dumps(y)) # convert y to bytes and get checksum
         self.X_checksum = calc_crc64(pickle.dumps(X)) # convert X to bytes and get checksum
         self.theta_checksum = calc_crc64(pickle.dumps(theta)) # convert theta to bytes and get checksum
-        self.seed = seed # User provided (if applciable). Otherwise will default to -1 
+        self.seed = getattr(options, '_seed', getrandbits(32))  # Try to pull seed from the Options class for consistency. If not set
+                                                                # just access from randbits call
 
     def display(self, detail:bool=False):
         """Displays basic validation info. Excludes lengthy results objects
