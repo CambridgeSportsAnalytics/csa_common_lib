@@ -28,6 +28,7 @@ def load_npz(file_path: str) -> dict:
         If the file does not exist or an error occurs during loading, 
         an empty dictionary is returned.
     """
+    
     if os.path.exists(file_path):
         # Try loading the .npz file into a dictionary.
         try:
@@ -69,6 +70,7 @@ def save_to_npz(filename: str = None, single_precision: bool = False, **data) ->
     ValueError
         If `filename` is not provided.
     """
+    
     if not filename:
         raise ValueError("Filename must be provided to save the data.")
 
