@@ -13,13 +13,10 @@ class PSRFunction(Enum):
     MAXFIT = (1, 'maxfit')
     GRID = (2, 'grid')
     GRID_SINGULARITY = (3, 'grid_singularity')
-    RELEVANCE = (4, 'relevance')
-    SIMILARITY = (5, 'similarity')
-    INFORMATIVENESS = (6, 'informativeness')
-    FIT = (7, 'fit')
-    ADJUSTED_FIT = (8, 'adjusted_fit')
-    ASYMMETRY = (9, 'asymmetry')
-    CO_OCCURENCE = (10, 'co-occurence')
+    PSR_BINARY = (4, 'psr_binary')
+    MAXFIT_BINARY= (5, 'maxfit_binary')
+    GRID_BINARY = (6, 'grid_binary')
+    GRID_SINGULARITY_BINARY = (7, 'grid_singularity_binary')
     
     
     def __str__(self):
