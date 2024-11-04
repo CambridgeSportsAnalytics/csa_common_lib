@@ -5,6 +5,26 @@ import io
 from tempfile import _TemporaryFileWrapper, SpooledTemporaryFile
 
 def is_valid_path(path:str):
+    """Checks if the specified path's directoryexists and is writable.
+
+    Parameters
+    ----------
+    path : str
+        The file path to validate. This function checks if the directory 
+        part of the path exists and is writable.
+
+    Returns
+    -------
+    bool
+        True if the directory exists and is writable.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the directory in `path` does not exist.
+    PermissionError
+        If the directory in `path` is not writable.
+    """    
     # Get the directory part of the path
     directory = os.path.dirname(path)
     
@@ -16,7 +36,8 @@ def is_valid_path(path:str):
     if not os.access(directory, os.W_OK):
         raise PermissionError(f"The directory '{directory}' is not writable.")
 
-    return True  # If no exceptions were raised, the path is valid
+    # If no exceptions were raised, the path is valid
+    return True
 
 
 def is_file_path(s: str):
