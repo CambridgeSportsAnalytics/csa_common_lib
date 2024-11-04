@@ -26,6 +26,12 @@ def get_table_columns(table_name: str, api_key: str) -> list:
     Exception
         If an error occurs during the API request or if the response contains 
         an error message.
+        
+    Example
+    -------
+    # Example usage (replace the API key and table name with actual values)
+    >>> columns = get_table_columns("vault_results", "dIIFfIJPcymzq2TDRhe7chJLVBSlsa7r3axgub00")
+    >>> print(columns)
     """
     
     
@@ -62,7 +68,3 @@ def get_table_columns(table_name: str, api_key: str) -> list:
     except Exception as e:
         # Catch and raise any exception with additional context.
         raise Exception(f"An error occurred while fetching table columns: {e}")
-
-# Example usage (replace the API key and table name with actual values)
-# columns = get_table_columns("vault_results", "dIIFfIJPcymzq2TDRhe7chJLVBSlsa7r3axgub00")
-# print(columns)
