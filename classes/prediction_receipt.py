@@ -39,8 +39,7 @@ class PredictionReceipt:
         self.y_checksum = calc_crc64(pickle.dumps(y)) # convert y to bytes and get checksum
         self.X_checksum = calc_crc64(pickle.dumps(X)) # convert X to bytes and get checksum
         self.theta_checksum = calc_crc64(pickle.dumps(theta)) # convert theta to bytes and get checksum
-        self.seed = getattr(options, '_seed', getrandbits(32))  # Try to pull seed from the Options class for consistency. If not set
-                                                                # just access from randbits call
+        self.seed = getattr(options, '_seed', "A seed was not set") # The np.random seed cannot be accessed via os calls. Referencing options instead. 
 
     def display(self, detail:bool=False):
         """Displays basic validation info. Excludes lengthy results objects
