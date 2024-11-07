@@ -243,7 +243,7 @@ class GridOptions(MaxFitOptions):
         super().__init__(**kwargs)
         self.options.update({
             'attribute_combi': None,
-            'max_iter': 1_000_000,
+            'max_iter': 1_003,
             'k': 1,
             '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
             '_seed': getrandbits(32) # initialize for combi 

@@ -103,12 +103,21 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
             y_N = value.size
         
         # X is a [N-by-K] matrix
+
         if key == 'X':
-            _validate_ndarray(value, np.ndarray)
-            (N, K) = value.shape
-            
-            if y_N != N:
-                raise ValueError("Inputs X and Y must have the same number of observations (rows)")
+            # if X is a reference file, skip validation. (X validation was already done upstream in this case)
+            if isinstance(value, str):
+                if '.json' in value:
+                    pass
+            else:
+                _validate_ndarray(value, np.ndarray)
+                (N, K) = value.shape
+
+                if N <= K:                
+                    raise ValueError("X: The number of observations (rows) must be greater than the number of variables (columns)")
+
+                if y_N != N:
+                    raise ValueError("Inputs X and Y must have the same number of observations (rows)")
 
         
         # validate the rest of the arguments

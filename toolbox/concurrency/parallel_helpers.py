@@ -105,7 +105,7 @@ def slice_matrices(q:int, slice_type:str, y_matrix, theta_matrix, X):
             raise ValueError("psrlib_async:slice_matrices:Invalid slice_type")
     
     # Get the number of variables
-    num_obs, num_var = X.shape
+    num_obs, num_var = y_matrix.shape[0], theta_matrix.shape[1]
     
     # Ensure that theta is a row vector
     if not _validate_ndarray(theta, 1, num_var):
