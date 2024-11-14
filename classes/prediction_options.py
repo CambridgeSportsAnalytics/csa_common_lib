@@ -1,8 +1,8 @@
 import numpy as np
 from random import getrandbits
 
-class OptionsMeta(type):
-    """Metaclass for preventing incorrect attribute references on Options classes"""
+class _OptionsMeta(type):
+    """Internal Metaclass for preventing incorrect attribute references on Options classes"""
 
     def __init__(cls, name, bases, dct):
         if not hasattr(cls, '_allowed_keys'):
@@ -18,7 +18,7 @@ class OptionsMeta(type):
         return instance
     
 
-class PredictionOptions(metaclass=OptionsMeta):
+class PredictionOptions(metaclass=_OptionsMeta):
     """A configurable options class for relevance-based predictions, including
     predict, maxfit, and grid models. This class provides a comprehensive 
     list of all possible input parameters, ensuring flexibility across 
