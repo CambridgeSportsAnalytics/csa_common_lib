@@ -1,7 +1,24 @@
 import numpy as np
 from random import getrandbits
 
-class PredictionOptions:
+class OptionsMeta(type):
+    """Metaclass for preventing incorrect attribute references on Options classes"""
+
+    def __init__(cls, name, bases, dct):
+        if not hasattr(cls, '_allowed_keys'):
+            cls._allowed_keys = set([])  # Initialize as an empty set if not defined
+        super().__init__(name, bases, dct)
+
+    def __call__(cls, *args, **kwargs):
+        instance = super().__call__(*args, **kwargs)
+        extra_keys = kwargs.keys() - cls._allowed_keys # Extra keys that don't belong. Ie. Mistaken attributes
+        if extra_keys:
+            # Throw error and list invalid keys for user to correct
+            raise AttributeError(f"Invalid class attribute(s): {extra_keys}. Allowed keys are: {cls._allowed_keys}")
+        return instance
+    
+
+class PredictionOptions(metaclass=OptionsMeta):
     """A configurable options class for relevance-based predictions, including
     predict, maxfit, and grid models. This class provides a comprehensive 
     list of all possible input parameters, ensuring flexibility across 
@@ -41,6 +58,7 @@ class PredictionOptions:
     """
 
     def __init__(self, **kwargs):
+
         self.options = {
             'threshold': [0],
             'is_threshold_percent': True,
@@ -49,6 +67,8 @@ class PredictionOptions:
             'adj_fit_multiplier': 'K',
             'cov_inv': None,
         }
+
+        self.__class__._allowed_keys = set(self.options.keys())
 
         # Update the options dictionary with any provided kwargs
         self.options.update(kwargs)
@@ -175,12 +195,17 @@ class MaxFitOptions(PredictionOptions):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.options.update({
-            'threshold': None,
-            'threshold_range': np.array((0, 0.20, 0.50, 0.80), dtype='float32'),
-            'stepsize': 0.20,
-            'objective': 'adjusted_fit',
-        })
+
+        maxfit_options = {
+                        'threshold': None,
+                        'threshold_range': np.array((0, 0.20, 0.50, 0.80), dtype='float32'),
+                        'stepsize': 0.20,
+                        'objective': 'adjusted_fit',
+                        }
+        
+        self.__class__._allowed_keys = self.__class__._allowed_keys.union(maxfit_options.keys())
+
+        self.options.update(maxfit_options)
         
         # Update the options dictionary with any provided kwargs
         self.options.update(kwargs)
@@ -241,13 +266,18 @@ class GridOptions(MaxFitOptions):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.options.update({
-            'attribute_combi': None,
-            'max_iter': 1_000,
-            'k': 1,
-            '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
-            '_seed': getrandbits(32) # initialize for combi 
-        })
+
+        grid_options = {
+                        'attribute_combi': None,
+                        'max_iter': 1_000,
+                        'k': 1,
+                        '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
+                        '_seed': getrandbits(32) # initialize for combi 
+                    }
+        
+        self.__class__._allowed_keys = self.__class__._allowed_keys.union(grid_options.keys())
+
+        self.options.update(grid_options)
         
         # Update the options dictionary with any provided kwargs
         self.options.update(kwargs)
