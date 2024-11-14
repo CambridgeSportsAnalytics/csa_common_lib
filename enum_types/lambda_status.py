@@ -13,5 +13,5 @@ class LambdaStatus(Enum):
     PENDING = (1, 'pending') # Inputs are waiting to be processed
 
     # Process Job    
-    PROCESSING = (10, 'processing')
-    COMPLETED = (11, 'completed')
+    PROCESSING = (10, 'processing') # Currently processing the job
+    COMPLETED = (11, 'completed') # Prediction task has been completed
