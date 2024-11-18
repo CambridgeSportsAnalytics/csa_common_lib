@@ -119,7 +119,14 @@ def slice_matrices(q:int, slice_type:str, y_matrix, theta_matrix, X):
     return y, theta
 
 def get_results_progress(processing_jobs):
-        """Print the status of the processing jobs."""
+        """Progress printout of get-jobs results collection.
+
+        Parameters
+        ----------
+        processing_jobs : list
+            List of booleans describing the number of jobs currently being processed
+        """
+
         num_processing = processing_jobs.count(True)
         num_completed = processing_jobs.count(False)
         total_jobs = len(processing_jobs)
@@ -128,6 +135,6 @@ def get_results_progress(processing_jobs):
         percent_processing = (num_processing / total_jobs) * 100
         percent_completed = (num_completed / total_jobs) * 100
         
-        # Print the progress on the same line
+        # Print the progress
         print(f"\rCollecting Results: {num_completed}/{total_jobs} jobs completed ({percent_completed:.2f}%), "
             f"{num_processing}/{total_jobs} jobs processing ({percent_processing:.2f}%)", end='')
