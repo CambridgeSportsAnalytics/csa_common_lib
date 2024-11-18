@@ -1,6 +1,7 @@
 
 # Third-party library imports
 import numpy as np  # Third-party library import
+import time # Third-party library import
 
 # Local application / library-specific imports
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor  # For parallel processing
@@ -88,16 +89,20 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
     # Unpack job_id and job_code using list comprehension
     job_id, job_code = zip(*jobs)
     
-    # Once we have all the job_id and job_codes for all the corresponding
-    # prediction tasks, we can get the results from CSA's server
+    # Set timeout to 15 minutes (15 * 60 seconds)
+    TIMEOUT = 15 * 60  # 15 minutes in seconds
+
     inputs_for_get = [
         (job_id[q], job_code[q]) for q in range(len(jobs))
     ]
-    
-    # Create an array to track processing jobs. 0 is complete, 1 is processing. 
+
+    # Create an array to track processing jobs. 0 is complete, 1 is processing.
     processing_jobs = [True] * len(inputs_for_get)
 
     completed_results = [None] * len(inputs_for_get)
+
+    # Track the start time
+    start_time = time.time()
 
     while True in processing_jobs:
         # Dispatch the get_results task in a multi-threaded pool
@@ -106,16 +111,35 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
             active_inputs = [inputs_for_get[i] for i in range(len(inputs_for_get)) if processing_jobs[i] == True]
             active_indices = [i for i in range(len(inputs_for_get)) if processing_jobs[i] == True]
 
-            results = list(executor.map(get_results_dispatcher, active_inputs))
+            # Submit tasks to the executor
+            future_to_index = {executor.submit(get_results_dispatcher, inputs_for_get[i]): i for i in active_indices}
+            
+            for future in future_to_index:
+                index = future_to_index[future]
+                try:
+                    # Wait for the result with a timeout
+                    result = future.result(timeout=TIMEOUT)
+                    
+                    if result[0] is not None:  # Or some other value passed back to indicate completion
+                        # Update job to completed
+                        processing_jobs[index] = False
+                        # Save completed result
+                        completed_results[index] = result
+                except TimeoutError:
+                    print(f"Job {index} timed out after {TIMEOUT / 60} minutes.")
+                    # Optionally handle the timeout here (e.g., mark as failed)
+                    processing_jobs[index] = False
+                    completed_results[index] = None
+                except Exception as e:
+                    print(f"Error processing job {index}: {str(e)}")
+                    # Optionally handle other errors here
+                    processing_jobs[index] = False
+                    completed_results[index] = None
 
-            # Update processing_jobs tracker and store completed results
-            for idx, result in zip(active_indices, results):
-                if result[0] is not None:  # Or some other value passed back to indicate completion
-                    # Update job to completed
-                    processing_jobs[idx] = False
-                    # Save completed result
-                    completed_results[idx] = result
-        
+        # Check if the total elapsed time exceeds the timeout limit
+        if time.time() - start_time > TIMEOUT:
+            print("Get results timeout exceeded. Exiting.")
+            break
     # restore notifier state
     _notifier.set_notifier_status(n_state)
 
