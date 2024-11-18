@@ -117,3 +117,17 @@ def slice_matrices(q:int, slice_type:str, y_matrix, theta_matrix, X):
     
     # Return y column vector and a theta row vector
     return y, theta
+
+def get_results_progress(processing_jobs):
+        """Print the status of the processing jobs."""
+        num_processing = processing_jobs.count(True)
+        num_completed = processing_jobs.count(False)
+        total_jobs = len(processing_jobs)
+        
+        # Calculate percentages
+        percent_processing = (num_processing / total_jobs) * 100
+        percent_completed = (num_completed / total_jobs) * 100
+        
+        # Print the progress on the same line
+        print(f"\rCollecting Results: {num_completed}/{total_jobs} jobs completed ({percent_completed:.2f}%), "
+            f"{num_processing}/{total_jobs} jobs processing ({percent_processing:.2f}%)", end='')

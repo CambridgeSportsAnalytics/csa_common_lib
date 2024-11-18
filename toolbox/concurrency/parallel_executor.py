@@ -6,6 +6,7 @@ import time # Third-party library import
 # Local application / library-specific imports
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor  # For parallel processing
 from csa_common_lib.toolbox import _notifier # For notification handling
+from csa_common_lib.toolbox.concurrency.parallel_helpers import get_results_progress
 
 def run_tasks_local(inputs, dispatcher, max_workers:int, notifier):
     """
@@ -89,6 +90,7 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
     # Unpack job_id and job_code using list comprehension
     job_id, job_code = zip(*jobs)
     
+ 
     # Set timeout to 15 minutes (15 * 60 seconds)
     TIMEOUT = 15 * 60  # 15 minutes in seconds
 
@@ -103,6 +105,8 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
 
     # Track the start time
     start_time = time.time()
+
+    
 
     while True in processing_jobs:
         # Dispatch the get_results task in a multi-threaded pool
@@ -135,11 +139,16 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
                     # Optionally handle other errors here
                     processing_jobs[index] = False
                     completed_results[index] = None
+            
+                # Print status after each iteration
+                get_results_progress(processing_jobs=processing_jobs)
 
         # Check if the total elapsed time exceeds the timeout limit
         if time.time() - start_time > TIMEOUT:
-            print("Get results timeout exceeded. Exiting.")
+            print("\n15 minutes have passed. Exiting.")
             break
+    
+    print("\n")
     # restore notifier state
     _notifier.set_notifier_status(n_state)
 
