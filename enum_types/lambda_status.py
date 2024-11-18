@@ -16,3 +16,4 @@ class LambdaStatus(Enum):
     # Process Job    
     PROCESSING = (10, 'processing') # Currently processing the job
     COMPLETED = (11, 'completed') # Prediction task has been completed
+

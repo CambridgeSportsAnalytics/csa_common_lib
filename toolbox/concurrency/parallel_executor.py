@@ -94,18 +94,36 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
         (job_id[q], job_code[q]) for q in range(len(jobs))
     ]
     
-    # Dispatch the get_results task in a multi-threaded pool
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        results = list(executor.map(get_results_dispatcher, inputs_for_get))
+    # Create an array to track processing jobs. 0 is complete, 1 is processing. 
+    processing_jobs = [True] * len(inputs_for_get)
+
+    completed_results = [None] * len(inputs_for_get)
+
+    while True in processing_jobs:
+        # Dispatch the get_results task in a multi-threaded pool
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            # Update the inputs
+            active_inputs = [inputs_for_get[i] for i in range(len(inputs_for_get)) if processing_jobs[i] == True]
+            active_indices = [i for i in range(len(inputs_for_get)) if processing_jobs[i] == True]
+
+            results = list(executor.map(get_results_dispatcher, active_inputs))
+
+            # Update processing_jobs tracker and store completed results
+            for idx, result in zip(active_indices, results):
+                if result[0] is not None:  # Or some other value passed back to indicate completion
+                    # Update job to completed
+                    processing_jobs[idx] = False
+                    # Save completed result
+                    completed_results[idx] = result
         
     # restore notifier state
     _notifier.set_notifier_status(n_state)
 
     # Unpack yhat results
-    yhat = np.vstack([result[0] for result in results])
+    yhat = np.vstack([result[0] for result in completed_results])
     
     # Unpack output_details results using list comprehension
-    yhat_details = [result[1] for result in results]
+    yhat_details = [result[1] for result in completed_results]
 
     # Return results
     return yhat, yhat_details
