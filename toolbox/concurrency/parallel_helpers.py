@@ -124,7 +124,8 @@ def get_results_progress(processing_jobs, failed_jobs:int):
         Parameters
         ----------
         processing_jobs : list
-            List of booleans describing the number of jobs currently being processed
+            List of booleans describing the number of jobs currently 
+            being processed
         """
 
         num_processing = processing_jobs.count(True)
