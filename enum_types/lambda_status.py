@@ -17,3 +17,10 @@ class LambdaStatus(Enum):
     PROCESSING = (10, 'processing') # Currently processing the job
     COMPLETED = (11, 'completed') # Prediction task has been completed
 
+    @classmethod
+    def status_by_code(cls, code):
+        """Retrieve the full enum object based on the code."""
+        for status in cls:
+            if status.value[0] == code:
+                return status.value
+        return None  

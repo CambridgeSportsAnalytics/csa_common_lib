@@ -98,21 +98,20 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
         (job_id[q], job_code[q]) for q in range(len(jobs))
     ]
 
-    # Create an array to track processing jobs. 0 is complete, 1 is processing.
+    # Create boolean array to track processing jobs.
     processing_jobs = [True] * len(inputs_for_get)
 
     completed_results = [None] * len(inputs_for_get)
 
+    failed_jobs = 0
+
     # Track the start time
     start_time = time.time()
-
-    
 
     while True in processing_jobs:
         # Dispatch the get_results task in a multi-threaded pool
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             # Update the inputs
-            active_inputs = [inputs_for_get[i] for i in range(len(inputs_for_get)) if processing_jobs[i] == True]
             active_indices = [i for i in range(len(inputs_for_get)) if processing_jobs[i] == True]
 
             # Submit tasks to the executor
@@ -123,15 +122,22 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
                 try:
                     # Wait for the result with a timeout
                     result = future.result(timeout=TIMEOUT)
-                    
-                    if result[0] is not None:  # Or some other value passed back to indicate completion
+
+                    detail_keys = result[1].keys()
+
+                    # If a yhat is returned or an error is reported mark as completed
+                    if result[0] is not None or 'error' in detail_keys:  
                         # Update job to completed
                         processing_jobs[index] = False
                         # Save completed result
                         completed_results[index] = result
+                        
+                        # increment failed jobs tracker
+                        if 'error' in detail_keys:
+                            failed_jobs += 1
+
                 except TimeoutError:
                     print(f"Job {index} timed out after {TIMEOUT / 60} minutes.")
-                    # Optionally handle the timeout here (e.g., mark as failed)
                     processing_jobs[index] = False
                     completed_results[index] = None
                 except Exception as e:
@@ -141,14 +147,15 @@ def run_tasks_api(inputs, dispatcher, get_results_dispatcher, max_workers:int, n
                     completed_results[index] = None
             
                 # Print status after each iteration
-                get_results_progress(processing_jobs=processing_jobs)
+                get_results_progress(processing_jobs=processing_jobs, failed_jobs=failed_jobs)
 
-        # Check if the total elapsed time exceeds the timeout limit
+        # Check if the total passes timeout cutoff
         if time.time() - start_time > TIMEOUT:
             print("\n15 minutes have passed. Exiting.")
             break
     
     print("\n")
+
     # restore notifier state
     _notifier.set_notifier_status(n_state)
 

@@ -9,6 +9,9 @@ class LambdaError(Enum):
         AWS lambda status codes and assigned messages. 
     """
 
+    # No error
+    NO_ERROR = (0, 'No error')
+
     # Post-job
     POST_JOB = (1, 'Something went wrong while posting a job to the server.')
 
@@ -18,3 +21,12 @@ class LambdaError(Enum):
     PAYLOAD = (4, 'Unable to parse input payload')
     X_INPUT = (5, 'Failed to load X_matrix input.')
     SAVE_RESULTS = (6, 'Failed to save prediction results.')
+
+    @classmethod
+    def error_by_code(cls, code):
+        """Retrieve the full enum object based on the code."""
+
+        for error in cls:
+            if error.value[0] == code:
+                return error.value
+        return None  

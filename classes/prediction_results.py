@@ -18,15 +18,22 @@ class PredictionResults:
     
 
     def __init__(self, results):
-        self.raw_data = results
+        if not results:
+            raise ValueError("PredictionResults: Input data cannot be empty.")
+
+
+        self.raw_data = results if isinstance(results, list) else [results]
         self._initialize_attributes()
 
         # compute weights concentration and add to class
-        self.weights_concentration = [np.std(row) for row in self.weights]
+        if hasattr(self, 'weights'):
+            self.weights_concentration = [np.std(row) for row in self.weights]
+
+        if hasattr(self,'status') and hasattr(self,'error'):
+            self.yhat = None
+
 
     def _initialize_attributes(self):
-        
-
         if not self.raw_data:
             return
         
