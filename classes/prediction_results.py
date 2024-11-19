@@ -21,7 +21,6 @@ class PredictionResults:
         if not results:
             raise ValueError("PredictionResults: Input data cannot be empty.")
 
-
         self.raw_data = results if isinstance(results, list) else [results]
         self._initialize_attributes()
 
@@ -67,7 +66,7 @@ class PredictionResults:
         Returns
         -------
         list
-            List of accessble attributes of the class.
+            List of accessible attributes of the class.
         """        
         
         attribute_list = [key for key in self.__dict__.keys() if not key.startswith('__')]

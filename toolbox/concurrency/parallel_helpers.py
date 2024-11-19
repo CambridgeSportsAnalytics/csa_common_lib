@@ -47,7 +47,7 @@ def thread_safe_print(message: str, print_lock:threading.Lock):
         A threading lock used to synchronize access to the print statement.
     """
     with print_lock:
-        print(message)
+        print(f"\r{message}", end='', flush=True)
 
 
 def slice_matrices(q:int, slice_type:str, y_matrix, theta_matrix, X):
@@ -137,5 +137,5 @@ def get_results_progress(processing_jobs, failed_jobs:int):
         percent_failed = (failed_jobs / total_jobs) * 100
         
         # Print the progress
-        print(f"\rCollecting Results: {num_completed}/{total_jobs} jobs completed ({percent_completed:.2f}%), "
-            f"{failed_jobs}/{total_jobs} jobs failed ({percent_failed:.2f}%), {num_processing}/{total_jobs} jobs still processing ({percent_processing:.2f}%)", end='')
+        print(
+            f"\rCSA Prediction Tasks: {total_jobs}/{total_jobs} submitted; {total_jobs-num_processing}/{total_jobs} processed; {failed_jobs}/{total_jobs} failed; {num_completed}/{total_jobs} retrieved.", end='')
