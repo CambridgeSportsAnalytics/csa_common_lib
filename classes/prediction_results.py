@@ -31,6 +31,7 @@ class PredictionResults:
 
         if hasattr(self,'status') and hasattr(self,'error'):
             self.yhat = None
+            print("Warning: Some attributes are missing in the results. Tasks may have failed.")
 
 
     def _initialize_attributes(self):
