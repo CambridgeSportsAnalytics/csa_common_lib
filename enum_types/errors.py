@@ -13,14 +13,14 @@ class LambdaError(Enum):
     NO_ERROR = (0, 'No error')
 
     # Post-job
-    POST_JOB = (1, 'GURU MEDITATION ERROR: Something went wrong while posting a job to the server.')
+    POST_JOB = (1, 'Something went wrong while posting a job to the server.')
 
     # Process Job    
-    PROCESS_JOB = (2, 'GURU MEDITATION ERROR: Something went wrong while processing a job.')
-    PREDICTION = (3, 'GURU MEDITATION ERROR: Prediction task failed.') # haven't come up with a good message yet.
-    PAYLOAD = (4, 'GURU MEDITATION ERROR: Unable to parse input payload')
-    X_INPUT = (5, 'GURU MEDITATION ERROR: Failed to load X_matrix input.')
-    SAVE_RESULTS = (6, 'GURU MEDITATION ERROR: Failed to save prediction results.')
+    PROCESS_JOB = (2, 'Something went wrong while processing a job.')
+    PREDICTION = (3, 'Prediction task failed.') # haven't come up with a good message yet.
+    PAYLOAD = (4, 'Unable to parse input payload')
+    X_INPUT = (5, 'Failed to load X_matrix input.')
+    SAVE_RESULTS = (6, 'Failed to save prediction results.')
 
     @classmethod
     def error_by_code(cls, code):
