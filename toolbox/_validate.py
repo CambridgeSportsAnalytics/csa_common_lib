@@ -110,6 +110,7 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
                 if '.json' in value:
                     pass
             else:
+                value = _check_missing_data(value) # Update X if missing data is found
                 _validate_ndarray(value, np.ndarray)
                 (N, K) = value.shape
 
@@ -402,3 +403,68 @@ def is_full_rank(X):
     
     # Check if the matrix is full rank
     return rank == min_dim
+
+def _check_missing_data(matrix:np.ndarray):
+    """Checks for missing data in the inputted matrix matrix
+
+    Parameters
+    ----------
+    matrix : ndarray
+        Inputted matrix data
+
+    Returns
+    -------
+    Bool    
+        True if missing data of any kind (except empty which is handled downstream)
+        False if checks pass
+    """
+
+    # Check for None values and turn them into NaN so we can use built-in Numpy features
+    if np.any(matrix == None):
+        # Replace None or null values with np.nan
+        matrix = np.where(matrix == None, np.nan, matrix)    
+
+    # Check for NaN values
+    if np.any(np.isnan(matrix)):
+        return _restore_data(matrix=matrix)
+
+    # If all checks pass, return matrix without restoring
+    return matrix
+
+def _restore_data(matrix:np.ndarray):
+    """
+    Restore missing data in a numpy 2D matrix by replacing NaN, None, or null 
+    values with the column mean, unless more than 80% of the column is missing.
+    
+    Parameters:
+        matrix (np.ndarray): Input 2D numpy array.
+    
+    Returns:
+        np.ndarray: Restored matrix with missing values replaced, and warnings issued for damaged columns.
+    """
+
+    # Constants for restoring data
+    observations, cols = matrix.shape
+    threshold = 0.8
+
+    # Create a boolean matrix missing Nan
+    missing_values = np.isnan(matrix)
+    missing_counts = np.sum(missing_values, axis=0) # Count missing values for each column
+
+    # Calculate the damage percent for each column
+    damage_percent = missing_counts / observations
+
+    # Find columns with damage that crosses threshold. 
+    high_damage_columns = np.where(damage_percent > threshold)[0] # Index 0 accesses index array of columns from np.where
+
+    # Raise warning for columns with significant damage
+    if high_damage_columns.size > 0:
+        raise ValueError(f"Columns at indices: {str(high_damage_columns)} have significant amounts of missing data")
+
+    # Compute column averages, ignoring NaN values
+    column_averages = np.nanmean(matrix, axis=0)
+
+    # Replace missing values with column averages
+    matrix = np.where(missing_values, column_averages, matrix)
+        
+    return matrix
