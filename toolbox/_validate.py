@@ -372,8 +372,7 @@ def _validate_str(obj, obj_name:str=None, allow_none:bool=True):
     bool
         Validation exit flag, True if object is a string
     """    
-    
-    
+        
     if allow_none & (obj is None):
         return True
     else:
@@ -390,7 +389,7 @@ def is_full_rank(X):
 
     Returns
     -------
-    boolean
+    bool
         True if X is full rank (no linearly dependent variables)
     """    
     
@@ -404,19 +403,22 @@ def is_full_rank(X):
     # Check if the matrix is full rank
     return rank == min_dim
 
-def _check_missing_data(matrix:np.ndarray):
-    """Checks for missing data in the inputted matrix matrix
+
+def _check_missing_data(matrix:np.ndarray, threshold:float=0.80):
+    """Checks for missing data for a given 2d matrix. This validator
+    will also restore damaged columns if their missing data ratio is
+    below a certain threshold.
 
     Parameters
     ----------
-    matrix : ndarray
-        Inputted matrix data
+    matrix : numpy.ndarray
+        Matrix to check for missing data (and address as necessary).
 
     Returns
     -------
-    Bool    
+    bool    
         True if missing data of any kind (except empty which is handled downstream)
-        False if checks pass
+        False if checks pass.
     """
 
     # Check for None values and turn them into NaN so we can use built-in Numpy features
@@ -426,26 +428,39 @@ def _check_missing_data(matrix:np.ndarray):
 
     # Check for NaN values
     if np.any(np.isnan(matrix)):
-        return _restore_data(matrix=matrix)
+        return _restore_data(matrix=matrix, threshold=threshold)
 
     # If all checks pass, return matrix without restoring
     return matrix
 
-def _restore_data(matrix:np.ndarray):
-    """
-    Restore missing data in a numpy 2D matrix by replacing NaN, None, or null 
-    values with the column mean, unless more than 80% of the column is missing.
-    
-    Parameters:
-        matrix (np.ndarray): Input 2D numpy array.
-    
-    Returns:
-        np.ndarray: Restored matrix with missing values replaced, and warnings issued for damaged columns.
-    """
 
+def _restore_data(matrix:np.ndarray, threshold:float=0.80):
+    """Restore missing data in a numpy 2D matrix by replacing NaN, None, 
+    or null values with the column mean, unless more than 80% of the 
+    column is missing.
+
+    Parameters
+    ----------
+    matrix : numpy.ndarray
+        Matrix with missing data to restore
+    threshold : float, optional
+        Missing data ratio per column, by default 0.80
+
+    Returns
+    -------
+    numpy.ndarray
+        Restored matrix with missing values replaced,
+        and warnings issued for damaged columns.
+    
+    Raises
+    ------
+    ValueError
+        If ratio of missing data per column exceeds the tolerance threshold.
+    """    
+    
+    
     # Constants for restoring data
     observations, cols = matrix.shape
-    threshold = 0.8
 
     # Create a boolean matrix missing Nan
     missing_values = np.isnan(matrix)
@@ -467,4 +482,5 @@ def _restore_data(matrix:np.ndarray):
     # Replace missing values with column averages
     matrix = np.where(missing_values, column_averages, matrix)
         
+    # Return restored matrix
     return matrix
