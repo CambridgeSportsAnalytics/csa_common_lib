@@ -84,4 +84,4 @@ class PredictionReceipt:
 
         # Save to a JSON file
         with open(f'{path}{file_name}.json', 'w') as json_file:
-            json.dump(obj_dict, json_file)
+            json.dumps(obj_dict, json_file)
