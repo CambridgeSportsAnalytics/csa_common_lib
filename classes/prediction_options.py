@@ -66,6 +66,7 @@ class PredictionOptions(metaclass=_OptionsMeta):
             'eval_type': 'both',
             'adj_fit_multiplier': 'K',
             'cov_inv': None,
+            'verify_missing_data': False,
         }
 
         self.__class__._allowed_keys = set(self.options.keys())
