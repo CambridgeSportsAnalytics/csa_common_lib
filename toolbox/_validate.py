@@ -110,7 +110,6 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
                 if '.json' in value:
                     pass
             else:
-                value = _check_missing_data(value) # Update X if missing data is found
                 _validate_ndarray(value, np.ndarray)
                 (N, K) = value.shape
 

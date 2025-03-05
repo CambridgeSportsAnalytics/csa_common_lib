@@ -72,6 +72,8 @@ class Float32Encoder(json.JSONEncoder):
         This method uses the pre-compiled `quantize_exp` attribute to apply
         precision consistently. The rounding mode `ROUND_HALF_EVEN` is used to
         minimize rounding bias in statistical data.
+        
+        If the value is NaN or Infinity, it is replaced with None (which serializes as null).
 
         Parameters
         ----------
@@ -83,6 +85,10 @@ class Float32Encoder(json.JSONEncoder):
         float
             The truncated float value, or the original value if truncation fails.
         """
+        
+        if np.isnan(x) or np.isinf(x):  # Replace NaN or Infinity with None
+            return None
+        
         try:
             return float(Decimal(format(x, '.8f')).quantize(
                 self.quantize_exp, rounding=ROUND_HALF_EVEN
