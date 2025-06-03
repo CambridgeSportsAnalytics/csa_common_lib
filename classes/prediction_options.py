@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from random import getrandbits
 
@@ -144,7 +145,7 @@ class PredictionOptions(metaclass=_OptionsMeta):
 
         # Copy attributes from the original instance to the new instance
         for attr, value in self.__dict__.items():
-            setattr(new_copy, attr, value)
+            setattr(new_copy, attr, copy.deepcopy(value))
 
         # Overwrite attributes with passed parameter
         for key, value in kwargs.items():
