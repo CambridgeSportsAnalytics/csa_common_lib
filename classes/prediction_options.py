@@ -202,7 +202,7 @@ class MaxFitOptions(PredictionOptions):
                         'threshold': None,
                         'threshold_range': np.array((0, 0.20, 0.50, 0.80), dtype='float32'),
                         'stepsize': 0.20,
-                        'objective': 'adjusted_fit',
+                        'objective': 'kfit',
                         }
         
         self.__class__._allowed_keys = self.__class__._allowed_keys.union(maxfit_options.keys())
