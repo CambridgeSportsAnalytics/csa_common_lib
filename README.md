@@ -1,6 +1,8 @@
 # CSA Common Library
 [![PyPI version](https://img.shields.io/pypi/v/csa-common-lib.svg)](https://pypi.org/project/csa-common-lib/)
 [![Python Version](https://img.shields.io/badge/python-%20v3.11-blue)](https://github.com/CambridgeSportsAnalytics/csa_common_lib)
+[![CodeFactor](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_common_lib/badge)](https://www.codefactor.io/repository/github/cambridgesportsanalytics/csa_common_lib)
+[![Total Lines of Code](https://tokei.rs/b1/github/CambridgeSportsAnalytics/csa_common_lib?category=code)](https://github.com/CambridgeSportsAnalytics/csa_common_lib)
 
 The **CSA Common Library** is a shared Python package that provides utility classes, enums, helper functions, and parallel processing tools used across the Cambridge Sports Analytics prediction ecosystem.
 
