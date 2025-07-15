@@ -15,7 +15,6 @@ It serves as the foundation for [`csa_prediction_engine`](https://github.com/Cam
 │  ├── prediction_options.py
 │  ├── prediction_receipt.py
 │  └── prediction_results.py
-│
 ├── enum_types/                   # Enumerations for flags, job types, functions, and results
 │  ├── errors.py
 │  ├── exit_flags.py
@@ -23,32 +22,30 @@ It serves as the foundation for [`csa_prediction_engine`](https://github.com/Cam
 │  ├── job_types.py
 │  ├── lambda_status.py
 │  └── results.py
-│
 ├── helpers/                      # Low-level helper modules
 │  ├── _arrays.py
 │  ├── _conversions.py
 │  ├── _os.py
 │  └── _vault.py
-│
 ├── toolbox/                      # Utility modules for classes, concurrency, file I/O, and stats
 │  ├── classes/
 │  ├── concurrency/
 │  ├── database/
 │  ├── npz/
 │  └── stats/
-│
 └── __init__.py                   # Package initialization_init__.py                  # Package initialization
 ```
 
-## Installation
+## 📦 Installation
 
-To install this package as part of the CSA environment, use:
+Install via PypI:
 
 ```bash
 pip install csa_common_lib
 ```
+Requires Python 3.11.
 
-## Usage
+## 🧪 Example Usage
 
 Here’s an example of how to use the prediction class options from the common library:
 
@@ -59,7 +56,12 @@ from csa_common_lib.classes.prediction_options import {
         GridOptions
     }
 ```
+For usage examples and integration, see the
+👉 [csa_prediction_engine](https://github.com/CambridgeSportsAnalytics/csa_prediction_engine) package.
 
+## 🤝 Contributing
 
-## License
+Bug reports and feature requests are welcome. Reach out to our team 📧 support@csanalytics.io
+
+## ⚖️ License
 (c)2023-2025 Cambridge Sports Analytics, LLC. All rights reserved.
