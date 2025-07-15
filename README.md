@@ -1,44 +1,43 @@
-# Cambridge Sports Analytics Common Library
+# CSA Common Library
+[![PyPI version](https://img.shields.io/pypi/v/csa-common-lib.svg)](https://pypi.org/project/csa-common-lib/)
+[![Python Version](https://img.shields.io/badge/python-%20v3.11-blue)](https://github.com/CambridgeSportsAnalytics/csa_common_lib)
 
-The **CSA Common Lib** is a shared library designed to provide utility modules, class definitions, enumerations, and helper functions for the **CSA Prediction Engine** package. It standardizes and simplifies complex operations across different parts of the system.
+The **CSA Common Library** is a shared Python package that provides utility classes, enums, helper functions, and parallel processing tools used across the Cambridge Sports Analytics prediction ecosystem.
 
-## Package Structure
+It serves as the foundation for [`csa_prediction_engine`](https://github.com/CambridgeSportsAnalytics/csa_prediction_engine), offering standardized structures and operations for job execution, result handling, configuration, and concurrency.
 
-The package is structured as follows:
+## 🧱 Package Structure
 
-```plaintext
-csa_common_lib/
-├── classes/
-   ├── prediction_options.py       # Configurations and options for predictions
-   ├── prediction_receipt.py       # Structures data for prediction receipts
-   └── prediction_results.py       # Handles and organizes prediction results
-
-├── enum_types/
-   ├── exit_flags.py               # Execution exit flag states
-   ├── functions.py                # Enumerates system functions
-   └── job_types.py                # Defines job types for concurrency management
-
-├── helpers/
-   ├── _arrays.py                  # Array manipulation and utility functions
-   ├── _conversions.py             # Data type conversion utilities
-   └── _os.py                      # Operating system interaction functions
-
-└── toolbox/
-    ├── classes/
-       └── utilities.py            # Utility functions for working with classes
-    
-    ├── concurrency/
-       ├── parallel_executor.py    # Parallel execution tools
-       └── parallel_helpers.py     # Helper functions for concurrency
-     
-    ├── database/
-       └── information.py          # Database utility and information tools
-     
-    ├── npz/
-       └── io_operations.py        # NPZ file input/output utilities
-     
-    └── stats/
-       └──                         # Statistical computation tools and functions
+```bash
+.
+├── classes/                      # Core data classes and result structures
+│  ├── float32_encoder.py
+│  ├── prediction_options.py
+│  ├── prediction_receipt.py
+│  └── prediction_results.py
+│
+├── enum_types/                   # Enumerations for flags, job types, functions, and results
+│  ├── errors.py
+│  ├── exit_flags.py
+│  ├── functions.py
+│  ├── job_types.py
+│  ├── lambda_status.py
+│  └── results.py
+│
+├── helpers/                      # Low-level helper modules
+│  ├── _arrays.py
+│  ├── _conversions.py
+│  ├── _os.py
+│  └── _vault.py
+│
+├── toolbox/                      # Utility modules for classes, concurrency, file I/O, and stats
+│  ├── classes/
+│  ├── concurrency/
+│  ├── database/
+│  ├── npz/
+│  └── stats/
+│
+└── __init__.py                   # Package initialization_init__.py                  # Package initialization
 ```
 
 ## Installation
