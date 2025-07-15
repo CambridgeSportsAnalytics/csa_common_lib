@@ -78,7 +78,7 @@ def validate_inputs(is_strict:bool, function_type:PSRFunction, **varargin):
         'most_eval': lambda key, obj, K: _validate_bool(obj, obj_name=key),
         'eval_type': lambda key, obj, K: _validate_str(obj, obj_name=key),
         'stepsize': lambda key, obj, K: _validate_numeric(obj, 0, 1, obj_name=key),
-        'attribute_combi': lambda key, obj, K:  _validate_ndarray(obj, cols=K, obj_name=key),
+        'attribute_combi': lambda key, obj, K: _validate_ndarray(obj, cols=K, obj_name=key),
         'k': lambda key, obj, K: _validate_numeric(obj, obj_name=key),
         'max_iter': lambda key, obj, K: _validate_numeric_or_ndarray(obj, obj_name=key),
         'adjusted_fit_multiplier': lambda key, obj, K: _validate_str(obj, obj_name=key),
