@@ -8,6 +8,7 @@ It serves as the foundation for [`csa_prediction_engine`](https://github.com/Cam
 
 ## 🧱 Package Structure
 
+```bash
 csa_common_lib/
 ├── classes/                      # Core data models and result containers
 │   ├── float32_encoder.py        # Optimized encoder for float32 serialization
@@ -37,6 +38,7 @@ csa_common_lib/
 │   └── stats/                    # Statistical computation modules (in progress)
 
 └── __init__.py                   # Package initializer
+```
 
 ## 📦 Installation
 
