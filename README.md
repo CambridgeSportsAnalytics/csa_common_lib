@@ -8,33 +8,35 @@ It serves as the foundation for [`csa_prediction_engine`](https://github.com/Cam
 
 ## 🧱 Package Structure
 
-```bash
-.
-├── classes/                      # Core data classes and result structures
-│  ├── float32_encoder.py
-│  ├── prediction_options.py
-│  ├── prediction_receipt.py
-│  └── prediction_results.py
-├── enum_types/                   # Enumerations for flags, job types, functions, and results
-│  ├── errors.py
-│  ├── exit_flags.py
-│  ├── functions.py
-│  ├── job_types.py
-│  ├── lambda_status.py
-│  └── results.py
-├── helpers/                      # Low-level helper modules
-│  ├── _arrays.py
-│  ├── _conversions.py
-│  ├── _os.py
-│  └── _vault.py
-├── toolbox/                      # Utility modules for classes, concurrency, file I/O, and stats
-│  ├── classes/
-│  ├── concurrency/
-│  ├── database/
-│  ├── npz/
-│  └── stats/
-└── __init__.py                   # Package initialization_init__.py                  # Package initialization
-```
+csa_common_lib/
+├── classes/                      # Core data models and result containers
+│   ├── float32_encoder.py        # Optimized encoder for float32 serialization
+│   ├── prediction_options.py     # Configuration objects for prediction jobs
+│   ├── prediction_receipt.py     # Receipt structure for submitted tasks
+│   └── prediction_results.py     # Interfaces for organizing prediction outputs
+
+├── enum_types/                   # Enumerations for function types, job control, and result metadata
+│   ├── errors.py                 # Lambda error codes and messages
+│   ├── exit_flags.py             # Execution exit status indicators
+│   ├── functions.py              # Function type identifiers
+│   ├── job_types.py              # Job types for task routing
+│   ├── lambda_status.py          # Lambda execution status codes
+│   └── results.py                # Keys and categories for result objects
+
+├── helpers/                      # Internal utility modules
+│   ├── _arrays.py                # Array manipulation and reshaping
+│   ├── _conversions.py           # Type and structure conversions
+│   ├── _os.py                    # OS-level interactions
+│   └── _vault.py                 # Tools for interfacing with the Prediction Vault
+
+├── toolbox/                      # Utilities for parallelism, data I/O, and statistical helpers
+│   ├── classes/                  # Class-level utilities
+│   ├── concurrency/              # Parallel execution and thread helpers
+│   ├── database/                 # Lightweight DB information tools
+│   ├── npz/                      # NPZ file I/O utilities
+│   └── stats/                    # Statistical computation modules (in progress)
+
+└── __init__.py                   # Package initializer
 
 ## 📦 Installation
 
