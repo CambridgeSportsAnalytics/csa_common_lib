@@ -47,7 +47,7 @@ csa_common_lib/
 Install via PypI:
 
 ```bash
-pip install csa_common_lib
+pip install csa-common-lib
 ```
 Requires Python 3.11.
 
