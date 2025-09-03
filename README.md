@@ -17,7 +17,7 @@ csa_common_lib/
 │   ├── prediction_options.py     # Configuration objects for prediction jobs
 │   ├── prediction_receipt.py     # Receipt structure for submitted tasks
 │   └── prediction_results.py     # Interfaces for organizing prediction outputs
-
+│
 ├── enum_types/                   # Enumerations for function types, job control, and result metadata
 │   ├── errors.py                 # Lambda error codes and messages
 │   ├── exit_flags.py             # Execution exit status indicators
@@ -25,20 +25,20 @@ csa_common_lib/
 │   ├── job_types.py              # Job types for task routing
 │   ├── lambda_status.py          # Lambda execution status codes
 │   └── results.py                # Keys and categories for result objects
-
+│
 ├── helpers/                      # Internal utility modules
 │   ├── _arrays.py                # Array manipulation and reshaping
 │   ├── _conversions.py           # Type and structure conversions
 │   ├── _os.py                    # OS-level interactions
 │   └── _vault.py                 # Tools for interfacing with the Prediction Vault
-
+│
 ├── toolbox/                      # Utilities for parallelism, data I/O, and statistical helpers
 │   ├── classes/                  # Class-level utilities
 │   ├── concurrency/              # Parallel execution and thread helpers
 │   ├── database/                 # Lightweight DB information tools
 │   ├── npz/                      # NPZ file I/O utilities
 │   └── stats/                    # Statistical computation modules (in progress)
-
+│
 └── __init__.py                   # Package initializer
 ```
 
