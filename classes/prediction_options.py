@@ -61,7 +61,7 @@ class PredictionOptions(metaclass=_OptionsMeta):
     def __init__(self, **kwargs):
 
         self.options = {
-            'threshold': [0],
+            'threshold': [0.5],
             'is_threshold_percent': True,
             'most_eval': True,
             'eval_type': 'both',
@@ -162,7 +162,7 @@ class MaxFitOptions(PredictionOptions):
     
     threshold : not applicable
         Max fit solves for the optimal threshold that maximizes the 
-        fit (or adjusted fit) value.
+        fit (or adjusted fit) value, by default [0.0, 0.2, 0.5, 0.8].
     most_eval : bool, optional (default=True)
         Specify the direction of threshold evluation on the censor score.
         The censor score is determined by eval_type.
@@ -192,7 +192,7 @@ class MaxFitOptions(PredictionOptions):
         super().__init__(**kwargs)
 
         maxfit_options = {
-            'threshold': np.array(0, 0.20, 0.50, 0.80),
+            'threshold': np.array([0.0, 0.2, 0.5, 0.8]),
             'objective': 'kfit',
             }
         
@@ -210,7 +210,8 @@ class GridOptions(MaxFitOptions):
     Inherits from MaxFitOptions and adds additional options.
     
     threshold : ndarray
-        Vector of threshold values to evaluate, bydefault (0, 0.20, 0.50, 0.80)
+        Vector of threshold values to evaluate, 
+        by default [0.0, 0.2, 0.5, 0.8]
     most_eval : bool, optional (default=True)
         Specify the direction of threshold evluation on the censor score.
         The censor score is determined by eval_type.
