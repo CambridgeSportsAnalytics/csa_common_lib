@@ -163,13 +163,6 @@ class MaxFitOptions(PredictionOptions):
     threshold : not applicable
         Max fit solves for the optimal threshold that maximizes the 
         fit (or adjusted fit) value.
-    threshold_range : tuple or ndarray
-        Min/max range for evaluating maxfit threshold, by default (0, 0.20, 0.50, 0.80)
-        If an ndarray is passed in, max fit evaluates over the specified
-        threshold values in the ndarray
-    stepsize : float, optional (default=0.20)
-        Stepsize to evaluate range of thresholds to solve for max fit.
-        Decreasing stepsize will increase the grid resolution.
     most_eval : bool, optional (default=True)
         Specify the direction of threshold evluation on the censor score.
         The censor score is determined by eval_type.
@@ -199,11 +192,9 @@ class MaxFitOptions(PredictionOptions):
         super().__init__(**kwargs)
 
         maxfit_options = {
-                        'threshold': None,
-                        'threshold_range': np.array((0, 0.20, 0.50, 0.80), dtype='float32'),
-                        'stepsize': 0.20,
-                        'objective': 'kfit',
-                        }
+            'threshold': np.array(0, 0.20, 0.50, 0.80),
+            'objective': 'kfit',
+            }
         
         self.__class__._allowed_keys = self.__class__._allowed_keys.union(maxfit_options.keys())
 
@@ -218,14 +209,8 @@ class GridOptions(MaxFitOptions):
     GridOptions Class:
     Inherits from MaxFitOptions and adds additional options.
     
-    threshold_range : tuple or ndarray
-        Min/max range for evaluating maxfit threshold, by default (0, 0.20, 0.50, 0.80)
-        If an ndarray is passed in, max fit evaluates over the specified
-        threshold values in the ndarray
-    stepsize : float, optional (default=0.20)
-        Stepsize to evaluate range of thresholds to solve for max fit.
-        Decreasing stepsize will increase the granularity of the search.
-        Not applicable if threshold_range is an ndarray.
+    threshold : ndarray
+        Vector of threshold values to evaluate, bydefault (0, 0.20, 0.50, 0.80)
     most_eval : bool, optional (default=True)
         Specify the direction of threshold evluation on the censor score.
         The censor score is determined by eval_type.
