@@ -68,6 +68,7 @@ class PredictionOptions(metaclass=_OptionsMeta):
             'adj_fit_multiplier': 'K',
             'cov_inv': None,
             'verify_missing_data': False,
+            'inv_method':'gaussian',
         }
 
         self.__class__._allowed_keys = set(self.options.keys())
