@@ -69,4 +69,4 @@ For usage examples and integration, see the
 Bug reports and feature requests are welcome. Reach out to our team 📧 support@csanalytics.io
 
 ## ⚖️ License
-Copyright (c) 2023-2025 Cambridge Prediction Analytics, LLC. All rights reserved.
+Copyright (c) 2023-2026 Cambridge Prediction Analytics, LLC. All rights reserved.
