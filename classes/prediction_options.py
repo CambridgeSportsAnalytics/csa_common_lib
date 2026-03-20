@@ -2,6 +2,15 @@ import copy
 import numpy as np
 from random import getrandbits
 
+
+# Grid object keys valid for _retain_grid_objects when passed as a list.
+# Used for validation to catch typos early.
+VALID_RETAIN_KEYS = frozenset({
+    'yhat_cells', 'adjusted_fit_cells', 'n_cells', 'weights_cells',
+    'k_cells', 'combi_cells', 'ysolo_cells', 'xi_solo_cells'
+})
+
+
 class _OptionsMeta(type):
     """Internal Metaclass for preventing incorrect attribute references on Options classes"""
 
@@ -235,10 +244,9 @@ class GridOptions(MaxFitOptions):
     k : int, optional (default=1)
         Lower bound for the number of variables to include for any 
         combination Q, by default 1.
-    _is_retain_all_grid_objects : boolean, optional (default=False)
-        Saves and returns the weights grid for all censors, this is the
-        the largest matrix in yhat_details. This is typically set to True
-        for audit or deep research and development purposes.
+    _retain_grid_objects : bool, list of str, or None, optional (default=False)
+        Controls which grid objects to retain. True retains all; False or None
+        retains none; list retains only the specified keys (see VALID_RETAIN_KEYS).
         
     Returns
     -------
@@ -260,8 +268,8 @@ class GridOptions(MaxFitOptions):
                         'attribute_combi': None,
                         'max_iter': 1_000,
                         'k': 1,
-                        '_is_retain_all_grid_objects': False, # Set this to True to retain memory expensive objects for audits or deep R&D
-                        '_seed': getrandbits(32) # initialize for combi 
+                        '_retain_grid_objects': False,
+                        '_seed': getrandbits(32) # initialize for combi
                     }
         
         self.__class__._allowed_keys = self.__class__._allowed_keys.union(grid_options.keys())
