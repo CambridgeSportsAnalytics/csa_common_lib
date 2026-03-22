@@ -7,7 +7,7 @@ from random import getrandbits
 # Used for validation to catch typos early.
 VALID_RETAIN_KEYS = frozenset({
     'yhat_cells', 'adjusted_fit_cells', 'n_cells', 'weights_cells',
-    'k_cells', 'combi_cells', 'ysolo_cells', 'xi_solo_cells'
+    'k_cells', 'combi_cells', 'ysolo_distribution'
 })
 
 
