@@ -4,6 +4,7 @@ Description of module should go here.
 
 """
 
+from .version import __version__
 
 # Options classes available for Optimal Variable Grid prediciton,
 # Max Fit prediction, and relevance-based prediction.
