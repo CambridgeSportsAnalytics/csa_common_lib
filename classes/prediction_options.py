@@ -53,6 +53,14 @@ class PredictionOptions(metaclass=_OptionsMeta):
         Adjusted fit multiplier. Specify either 'log', 'K', or '1'.
     cov_inv : ndarray [K-by-K], optional (default=None)
         Inverse covariance matrix, specify for speed.
+    verify_missing_data : bool, optional (default=False)
+        Verify missing data in the input data.
+    inv_method : str, optional (default='gaussian')
+        Method to use for inverse covariance matrix.
+    _output_scale : str, optional (default='default')
+        Specify the scale of the output prediction.
+        'default': default scale (linear)
+        'logistic': logistic scale (0, 1)
 
     Returns
     -------
@@ -78,6 +86,7 @@ class PredictionOptions(metaclass=_OptionsMeta):
             'cov_inv': None,
             'verify_missing_data': False,
             'inv_method':'gaussian',
+            '_output_scale': 'default'
         }
 
         self.__class__._allowed_keys = set(self.options.keys())
