@@ -2,6 +2,12 @@ import copy
 import numpy as np
 from random import getrandbits
 
+from csa_common_lib.enum_types.missing_moments import MissingMoments
+
+# Accepted on construction / clone_with / init_from_dict, then folded into
+# missing_moments. Not stored in options after normalize.
+_MISSING_MOMENTS_ALIAS = "verify_missing_data"
+
 
 # Grid object keys valid for _retain_grid_objects when passed as a list.
 # Used for validation to catch typos early.
@@ -25,6 +31,8 @@ class _OptionsMeta(type):
         if extra_keys:
             # Throw error and list invalid keys for user to correct
             raise AttributeError(f"Invalid class attribute(s): {extra_keys}. Allowed keys are: {cls._allowed_keys}")
+        if hasattr(instance, "_normalize_missing_moments"):
+            instance._normalize_missing_moments()
         return instance
     
 
@@ -53,10 +61,13 @@ class PredictionOptions(metaclass=_OptionsMeta):
         Adjusted fit multiplier. Specify either 'log', 'K', or '1'.
     cov_inv : ndarray [K-by-K], optional (default=None)
         Inverse covariance matrix, specify for speed.
-    verify_missing_data : bool, optional (default=False)
-        How μ, Σ, and PSR N treat NaNs. Incomplete X rows still receive
-        zero prediction weight. False = pairwise moments; True = listwise
-        complete-case moments.
+    missing_moments : {"pairwise", "complete"} or MissingMoments, optional
+        How μ, Σ, and PSR N treat NaNs. Does **not** drop the row from ŷ
+        (incomplete X rows still get weight 0). Default ``"pairwise"``.
+        ``"complete"`` is listwise complete-case (MATLAB ``'complete'``).
+    verify_missing_data : bool, optional
+        Deprecated alias: ``True`` → ``missing_moments="complete"``,
+        ``False`` leaves ``missing_moments`` as given (default pairwise).
     inv_method : str, optional (default='gaussian')
         Method to use for inverse covariance matrix.
     _output_scale : str, optional (default='default')
@@ -86,21 +97,42 @@ class PredictionOptions(metaclass=_OptionsMeta):
             'eval_type': 'both',
             'adj_fit_multiplier': 'K',
             'cov_inv': None,
-            'verify_missing_data': False,
+            'missing_moments': MissingMoments.PAIRWISE,
             'inv_method':'gaussian',
             '_output_scale': 'default'
         }
 
-        self.__class__._allowed_keys = set(self.options.keys())
+        self.__class__._allowed_keys = set(self.options.keys()) | {_MISSING_MOMENTS_ALIAS}
 
         # Update the options dictionary with any provided kwargs
         self.options.update(kwargs)
 
 
+    def _normalize_missing_moments(self):
+        """Fold verify_missing_data into missing_moments; store the enum.
+
+        ``verify_missing_data=True`` forces complete (same as Rust FFI).
+        ``False`` leaves ``missing_moments`` as given.
+        """
+        opts = self.options
+        alias = opts.pop(_MISSING_MOMENTS_ALIAS, None)
+        raw = opts.get("missing_moments", MissingMoments.PAIRWISE)
+        if alias is None:
+            opts["missing_moments"] = MissingMoments.parse(raw)
+            return
+        if MissingMoments.parse(alias) is MissingMoments.COMPLETE:
+            opts["missing_moments"] = MissingMoments.COMPLETE
+        else:
+            opts["missing_moments"] = MissingMoments.parse(raw)
+
     def __getattr__(self, name):
         # Avoid recursion by checking if the attribute is already present in __dict__
         if name in self.__dict__:
             return self.__dict__[name]
+
+        if name == _MISSING_MOMENTS_ALIAS and "options" in self.__dict__:
+            mm = self.__dict__["options"].get("missing_moments", MissingMoments.PAIRWISE)
+            return MissingMoments.parse(mm).drop_na()
 
         # Check if 'options' is in self.__dict__ to avoid KeyError
         if 'options' in self.__dict__ and name in self.__dict__['options']:
@@ -113,6 +145,12 @@ class PredictionOptions(metaclass=_OptionsMeta):
     def __setattr__(self, name, value):
         if name == "options":
             super().__setattr__(name, value)
+        elif name == _MISSING_MOMENTS_ALIAS and "options" in self.__dict__:
+            self.options["missing_moments"] = (
+                MissingMoments.COMPLETE if value else MissingMoments.PAIRWISE
+            )
+        elif name == "missing_moments" and "options" in self.__dict__:
+            self.options["missing_moments"] = MissingMoments.parse(value)
         elif 'options' in self.__dict__ and name in self.options:
             self.options[name] = value
         else:
@@ -143,10 +181,8 @@ class PredictionOptions(metaclass=_OptionsMeta):
         
         # Iterate through input dict key/value pairs
         for key, value in inputs.items():
-            # If obj attribute matches key in input dict
-            if hasattr(self, key):
-                # Update corresponding attribute in options object to hold dictionary value
-                super().__setattr__(key, value)  # Use super() to avoid calling custom __setattr__
+            if key in self.__class__._allowed_keys:
+                setattr(self, key, value)
 
 
     def clone_with(self, **kwargs):
@@ -217,7 +253,9 @@ class MaxFitOptions(PredictionOptions):
             'objective': 'kfit',
             }
         
-        self.__class__._allowed_keys = self.__class__._allowed_keys.union(maxfit_options.keys())
+        self.__class__._allowed_keys = self.__class__._allowed_keys.union(
+            maxfit_options.keys()
+        ) | {_MISSING_MOMENTS_ALIAS}
 
         self.options.update(maxfit_options)
         
@@ -283,7 +321,9 @@ class GridOptions(MaxFitOptions):
                         '_seed': getrandbits(32) # initialize for combi
                     }
         
-        self.__class__._allowed_keys = self.__class__._allowed_keys.union(grid_options.keys())
+        self.__class__._allowed_keys = self.__class__._allowed_keys.union(
+            grid_options.keys()
+        ) | {_MISSING_MOMENTS_ALIAS}
 
         self.options.update(grid_options)
         

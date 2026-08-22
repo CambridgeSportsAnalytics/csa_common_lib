@@ -11,6 +11,7 @@ from .version import __version__
 from .classes.prediction_options import GridOptions
 from .classes.prediction_options import MaxFitOptions
 from .classes.prediction_options import PredictionOptions
+from .enum_types.missing_moments import MissingMoments
 
 from .classes.prediction_results import PredictionResults
 from .classes.prediction_receipt import PredictionReceipt
