@@ -54,7 +54,9 @@ class PredictionOptions(metaclass=_OptionsMeta):
     cov_inv : ndarray [K-by-K], optional (default=None)
         Inverse covariance matrix, specify for speed.
     verify_missing_data : bool, optional (default=False)
-        Verify missing data in the input data.
+        How μ, Σ, and PSR N treat NaNs. Incomplete X rows still receive
+        zero prediction weight. False = pairwise moments; True = listwise
+        complete-case moments.
     inv_method : str, optional (default='gaussian')
         Method to use for inverse covariance matrix.
     _output_scale : str, optional (default='default')
