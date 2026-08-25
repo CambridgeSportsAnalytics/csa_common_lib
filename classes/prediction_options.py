@@ -17,6 +17,20 @@ VALID_RETAIN_KEYS = frozenset({
 })
 
 
+def _parse_bool_flag(value, name="flag"):
+    """Parse a bool from bool / 0/1 / true-false strings."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, np.integer)) and value in (0, 1):
+        return bool(value)
+    s = str(value).strip().lower()
+    if s in ("true", "1", "yes", "on"):
+        return True
+    if s in ("false", "0", "no", "off"):
+        return False
+    raise ValueError(f"{name} must be true/false; got {value!r}")
+
+
 class _OptionsMeta(type):
     """Internal Metaclass for preventing incorrect attribute references on Options classes"""
 
@@ -151,6 +165,10 @@ class PredictionOptions(metaclass=_OptionsMeta):
             )
         elif name == "missing_moments" and "options" in self.__dict__:
             self.options["missing_moments"] = MissingMoments.parse(value)
+        elif name == "adjust_impact_for_missing" and "options" in self.__dict__:
+            self.options["adjust_impact_for_missing"] = _parse_bool_flag(
+                value, name="adjust_impact_for_missing"
+            )
         elif 'options' in self.__dict__ and name in self.options:
             self.options[name] = value
         else:
@@ -293,6 +311,10 @@ class GridOptions(MaxFitOptions):
     k : int, optional (default=1)
         Lower bound for the number of variables to include for any 
         combination Q, by default 1.
+    adjust_impact_for_missing : bool, optional (default=True)
+        Incomplete-column IOF / IOP vs a Bernoulli 0/1 include-k null
+        (NaNs kept). Off is the pre-adjustment baseline. Complete columns,
+        composite yhat, fit, variable weights, and CCTP are unchanged.
     _retain_grid_objects : bool, list of str, or None, optional (default=False)
         Controls which grid objects to retain. True retains all; False or None
         retains none; list retains only the specified keys (see VALID_RETAIN_KEYS).
@@ -317,6 +339,7 @@ class GridOptions(MaxFitOptions):
                         'attribute_combi': None,
                         'max_iter': 1_000,
                         'k': 1,
+                        'adjust_impact_for_missing': True,
                         '_retain_grid_objects': False,
                         '_seed': getrandbits(32) # initialize for combi
                     }
@@ -329,3 +352,7 @@ class GridOptions(MaxFitOptions):
         
         # Update the options dictionary with any provided kwargs
         self.options.update(kwargs)
+        self.options['adjust_impact_for_missing'] = _parse_bool_flag(
+            self.options.get('adjust_impact_for_missing', True),
+            name='adjust_impact_for_missing',
+        )
