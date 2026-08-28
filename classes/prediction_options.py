@@ -313,9 +313,10 @@ class GridOptions(MaxFitOptions):
         Lower bound for the number of variables to include for any 
         combination Q, by default 1.
     adjust_impact_for_missing : bool, optional (default=True)
-        Incomplete-column IOF / IOP vs a Bernoulli 0/1 include-k null
-        (NaNs kept). Off is the pre-adjustment baseline. Complete columns,
-        composite yhat, fit, variable weights, and CCTP are unchanged.
+        Incomplete-column IOF / IOP vs an uninformative include-k null
+        with the same missingness, mean, and sd as column k (NaNs kept).
+        Off is the pre-adjustment baseline. Complete columns, composite
+        yhat, fit, variable weights, and CCTP are unchanged.
     _retain_grid_objects : bool, list of str, or None, optional (default=False)
         Controls which grid objects to retain. True retains all; False or None
         retains none; list retains only the specified keys (see VALID_RETAIN_KEYS).
