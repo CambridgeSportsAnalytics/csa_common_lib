@@ -13,7 +13,7 @@ _MISSING_MOMENTS_ALIAS = "verify_missing_data"
 # Used for validation to catch typos early.
 VALID_RETAIN_KEYS = frozenset({
     'yhat_cells', 'adjusted_fit_cells', 'n_cells', 'weights_cells',
-    'k_cells', 'combi_cells', 'ysolo_distribution'
+    'k_cells', 'combi_cells', 'ysolo_distribution', 'ysolo_cells',
 })
 
 
@@ -85,9 +85,10 @@ class PredictionOptions(metaclass=_OptionsMeta):
     inv_method : str, optional (default='gaussian')
         Method to use for inverse covariance matrix.
     _output_scale : str, optional (default='default')
-        Specify the scale of the output prediction.
-        'default': default scale (linear)
-        'logistic': logistic scale (0, 1)
+        Scale of the returned prediction. ``default`` is the response
+        (linear) scale. ``logistic`` maps the finished composite ŷ
+        through Chapter 4 once (mix on the response scale, then map).
+        Inner grid and maxfit cells always stay on the response scale.
 
     Returns
     -------
